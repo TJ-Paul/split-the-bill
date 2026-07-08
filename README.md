@@ -1,6 +1,6 @@
 # Split the Bill 🍔👫
 
-Split the Bill is a sleek, efficient Android application designed to simplify the process of splitting bills and tracking orders when dining out with friends. No more scratching your head over who owes what – this app handles the math for you!
+Split the Bill is a sleek, efficient Android application designed to simplify the process of splitting bills and tracking orders when dining out with friends. No more scratching your head over who owes what – this app handles the math for you! A completely vibe coded app over multiple cups of tea.
 
 <br>
 
