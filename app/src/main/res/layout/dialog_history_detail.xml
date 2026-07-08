@@ -56,16 +56,22 @@
         app:layout_constraintTop_toBottomOf="@id/tvLogTitle"
         app:layout_constraintVertical_bias="0.0">
 
-        <TextView
-            android:id="@+id/tvLogDetails"
+        <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="monospace"
-            android:lineSpacingExtra="4dp"
-            android:padding="16dp"
-            android:textColor="@color/color_on_surface"
-            android:textSize="12sp"
-            tools:text="Details go here..." />
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvLogDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="monospace"
+                android:lineSpacingExtra="4dp"
+                android:padding="16dp"
+                android:textColor="@color/color_on_surface"
+                android:textSize="11sp"
+                tools:text="Details go here..." />
+        </HorizontalScrollView>
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.button.MaterialButton

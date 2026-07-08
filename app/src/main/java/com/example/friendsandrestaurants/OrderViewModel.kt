@@ -164,51 +164,100 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         val ordersList = _orders.value ?: return "No orders found."
         if (ordersList.isEmpty()) return "No friends or orders added yet."
         
+        // Dynamic column width calculation based on content
+        var maxNameLen = "FRIEND".length
+        var maxItemLen = "ITEM & INFO".length
+        
+        ordersList.forEach {
+            maxNameLen = maxOf(maxNameLen, it.friendName.length)
+            maxItemLen = maxOf(maxItemLen, it.foodItem.length)
+            val pricePaidStr = "${it.paid.toInt()} / ${it.price.toInt()} tk"
+            maxItemLen = maxOf(maxItemLen, pricePaidStr.length)
+            val cb = it.cashback
+            if (cb != 0.0) {
+                val label = if (cb > 0) "REFUND" else "DUE"
+                maxItemLen = maxOf(maxItemLen, "$label: ${abs(cb).toInt()} tk".length)
+            }
+        }
+        
+        // Add relative padding and boundaries
+        val c1W = (maxNameLen + 6).coerceIn(12, 20)
+        val c2W = (maxItemLen + 6).coerceIn(16, 28)
+        
         val sb = StringBuilder()
         
-        sb.append(String.format(Locale.getDefault(), "%-14s | %-14s\n", "NAME", "ITEM"))
-        sb.append(String.format(Locale.getDefault(), "%-14s | %-14s\n", "PRICE", "PAID"))
-        sb.append("=".repeat(31)).append("\n\n")
+        fun line(c: String = "-") = "+${c.repeat(c1W)}+${c.repeat(c2W)}+\n"
+
+        fun wrap(text: String, width: Int): List<String> {
+            if (text.isEmpty()) return listOf("")
+            val contentWidth = (width - 2).coerceAtLeast(1)
+            return text.chunked(contentWidth)
+        }
+
+        fun row(s1: String, s2: String): String {
+            val lines1 = wrap(s1, c1W)
+            val lines2 = wrap(s2, c2W)
+            val maxLines = maxOf(lines1.size, lines2.size)
+            val res = StringBuilder()
+            for (i in 0 until maxLines) {
+                val p1 = center(lines1.getOrElse(i) { "" }, c1W)
+                val p2 = center(lines2.getOrElse(i) { "" }, c2W)
+                res.append("|$p1|$p2|\n")
+            }
+            return res.toString()
+        }
+        
+        sb.append(line())
+        sb.append(row("FRIEND", "ITEM & INFO"))
+        sb.append(line("="))
         
         var totalBill = 0.0
         var totalPaid = 0.0
         
         for (order in ordersList) {
-            sb.append(String.format(Locale.getDefault(), "%-14s | %-14s\n", 
-                order.friendName.take(14),
-                order.foodItem.take(14)
-            ))
-            sb.append(String.format(Locale.getDefault(), "%-14d | %-14d\n", 
-                order.price.toInt(),
-                order.paid.toInt()
-            ))
+            sb.append(row(order.friendName, order.foodItem))
+            sb.append(row("", "${order.paid.toInt()} / ${order.price.toInt()} tk"))
             
             val cb = order.cashback
             if (cb != 0.0) {
                 val label = if (cb > 0) "REFUND" else "DUE"
-                sb.append(String.format(Locale.getDefault(), "   └ %s: %d tk\n", label, abs(cb).toInt()))
+                sb.append(row("", "$label: ${abs(cb).toInt()} tk"))
             }
-            sb.append("-".repeat(31)).append("\n")
+            sb.append(line())
             
             totalBill += order.price
             totalPaid += order.paid
         }
         
         sb.append("\n")
-        sb.append(String.format(Locale.getDefault(), "TOTAL BILL:      %d tk\n", totalBill.toInt()))
-        sb.append(String.format(Locale.getDefault(), "TOTAL PAID:      %d tk\n", totalPaid.toInt()))
+        val totalWidth = c1W + c2W + 3
+        
+        fun footerRow(label: String, value: String): String {
+            val space = totalWidth - label.length - value.length
+            return label + " ".repeat(maxOf(1, space)) + value + "\n"
+        }
+        
+        sb.append(footerRow("TOTAL BILL:", "${totalBill.toInt()} tk"))
+        sb.append(footerRow("TOTAL PAID:", "${totalPaid.toInt()} tk"))
+        sb.append("-".repeat(totalWidth)).append("\n")
         
         val netChange = totalPaid - totalBill
-        sb.append("=".repeat(31)).append("\n")
         if (netChange > 0) {
-            sb.append(String.format(Locale.getDefault(), "OVERALL REFUND:  %d tk 💰", netChange.toInt()))
+            sb.append(String.format(Locale.getDefault(), "OVERALL REFUND: %d tk 💰", netChange.toInt()))
         } else if (netChange < 0) {
-            sb.append(String.format(Locale.getDefault(), "OVERALL DUE:     %d tk ⚠️", abs(netChange).toInt()))
+            sb.append(String.format(Locale.getDefault(), "OVERALL DUE:    %d tk ⚠️", abs(netChange).toInt()))
         } else {
-            sb.append("STATUS:          ALL SETTLED ✅")
+            sb.append("STATUS:         ALL SETTLED ✅")
         }
 
         return sb.toString()
+    }
+
+    private fun center(text: String, width: Int): String {
+        val padding = width - text.length
+        val left = padding / 2
+        val right = padding - left
+        return " ".repeat(maxOf(0, left)) + text + " ".repeat(maxOf(0, right))
     }
 
     private fun formatName(name: String): String {
