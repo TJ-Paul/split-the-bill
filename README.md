@@ -1,6 +1,9 @@
 # FriendsAndRestaurants 🍔👫
 
 FriendsAndRestaurants is a sleek, efficient Android application designed to simplify the process of splitting bills and tracking orders when dining out with friends. No more scratching your head over who owes what – this app handles the math for you!
+## ⬇ Download .apk
+
+
 
 ## ✨ Features
 
@@ -34,8 +37,7 @@ You can find the latest build of the app in the `build` outputs folder.
 
 ### How to get the APK:
 1.  **Build the Project**: In Android Studio, go to `Build > Build Bundle(s) / APK(s) > Build APK(s)`.
-2.  **Locate the File**: Once the build finishes, a notification will appear. Click **'locate'** or use the link below:
-    [**Download app-debug.apk**](app/build/outputs/apk/debug/app-debug.apk)
+2.  **Locate the File**: Once the build finishes, a notification will appear. Click **'locate'**. 
 3.  **Install**: Transfer this `.apk` file to your Android device and open it to install the app.
 
 ---
