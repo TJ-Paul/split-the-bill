@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ============================================================
+         Palette sourced from the provided screenshot
+         (terracotta orange → honey yellow → sage green → dusty teal)
+         ============================================================ -->
+    <color name="palette_orange">#E8834A</color>
+    <color name="palette_orange_dark">#C96B36</color>
+    <color name="palette_yellow">#F0CE6B</color>
+    <color name="palette_yellow_dark">#DDB94A</color>
+    <color name="palette_green">#A3C585</color>
+    <color name="palette_green_dark">#7FA862</color>
+    <color name="palette_teal">#6B9B96</color>
+    <color name="palette_teal_dark">#4F7A77</color>
+
+    <!-- Neutrals -->
+    <color name="warm_cream">#FFF8EC</color>
+    <color name="warm_white">#FFFFFF</color>
+    <color name="warm_card">#FFFDF8</color>
+    <color name="ink_900">#2E2A26</color>
+    <color name="ink_600">#6B6459</color>
+    <color name="ink_300">#C9C1B3</color>
+    <color name="hairline">#EFE6D6</color>
+
+    <!-- Semantic roles -->
+    <color name="color_primary">@color/palette_teal</color>
+    <color name="color_primary_dark">@color/palette_teal_dark</color>
+    <color name="color_primary_container">#DCEAE8</color>
+
+    <color name="color_secondary">@color/palette_orange</color>
+    <color name="color_secondary_dark">@color/palette_orange_dark</color>
+    <color name="color_secondary_container">#FBE3D2</color>
+
+    <color name="color_tertiary">@color/palette_yellow</color>
+    <color name="color_tertiary_container">#FBF0D2</color>
+
+    <color name="color_success">@color/palette_green</color>
+    <color name="color_success_container">#E7F0DD</color>
+
+    <color name="color_background">@color/warm_cream</color>
+    <color name="color_surface">@color/warm_card</color>
+    <color name="color_on_primary">#FFFFFF</color>
+    <color name="color_on_secondary">#FFFFFF</color>
+    <color name="color_on_surface">@color/ink_900</color>
+    <color name="color_on_surface_variant">@color/ink_600</color>
+    <color name="color_outline">@color/hairline</color>
+
+</resources>

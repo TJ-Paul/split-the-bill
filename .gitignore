@@ -1,0 +1,39 @@
+# Gradle files
+.gradle/
+build/
+
+# Kotlin
+.kotlin/
+
+# IDE and Project files
+# It is generally recommended to ignore the entire .idea folder
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Local configuration (contains local SDK paths, etc.)
+local.properties
+
+# Android Studio captures
+captures/
+
+# External Native Build
+.externalNativeBuild/
+.cxx/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Keystore files (Security: NEVER upload these to GitHub)
+*.jks
+*.keystore
+*.p12
+*.pem
+
+# Secrets properties
+secrets.properties
