@@ -22,6 +22,7 @@ import com.example.friendsandrestaurants.databinding.DialogAddFriendFlowBinding
 import com.example.friendsandrestaurants.databinding.DialogHistoryDetailBinding
 import com.example.friendsandrestaurants.databinding.DialogBulkAddBinding
 import com.example.friendsandrestaurants.databinding.DialogListBinding
+import com.example.friendsandrestaurants.databinding.DialogQuickAddFoodBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class FirstFragment : Fragment() {
@@ -87,6 +88,58 @@ class FirstFragment : Fragment() {
         binding.btnClear.setOnClickListener {
             showWipeConfirmationDialog()
         }
+
+        val fabAddFood = requireActivity().findViewById<View>(R.id.fab_add_food)
+        fabAddFood?.setOnClickListener {
+            showQuickAddFoodDialog()
+        }
+    }
+
+    private fun showQuickAddFoodDialog() {
+        val currentFriends = viewModel.orders.value?.map { it.friendName }?.distinct()?.sorted() ?: emptyList()
+        if (currentFriends.isEmpty()) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Quick Add Food")
+                .setMessage("No friends added yet. Add friends first!")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
+        val dialogBinding = DialogQuickAddFoodBinding.inflate(layoutInflater)
+        
+        val foodSuggestions = viewModel.allUniqueFoodItems.value?.toList() ?: emptyList()
+        val foodAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, foodSuggestions)
+        dialogBinding.etFoodName.setAdapter(foodAdapter)
+
+        val adapter = SelectableFriendAdapter(currentFriends)
+        dialogBinding.rvFriends.layoutManager = LinearLayoutManager(requireContext())
+        dialogBinding.rvFriends.adapter = adapter
+
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogBinding.root)
+            .create()
+
+        dialogBinding.btnAdd.setOnClickListener {
+            val food = dialogBinding.etFoodName.text.toString()
+            val price = dialogBinding.etPrice.text.toString().toDoubleOrNull() ?: 0.0
+            val selected = adapter.selectedFriends.toList()
+            
+            if (food.isNotBlank() && selected.isNotEmpty()) {
+                viewModel.addFoodToFriends(selected, food, price)
+                dialog.dismiss()
+            } else if (food.isBlank()) {
+                dialogBinding.etFoodName.error = "Food name required"
+            } else {
+                android.widget.Toast.makeText(requireContext(), "Select at least one friend", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        dialogBinding.btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        dialog.show()
     }
 
     private fun showWipeConfirmationDialog() {

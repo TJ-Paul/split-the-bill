@@ -13,6 +13,8 @@
     <color name="palette_green_dark">#7FA862</color>
     <color name="palette_teal">#6B9B96</color>
     <color name="palette_teal_dark">#4F7A77</color>
+    <color name="cyan">#00BCD4</color>
+    <color name="on_cyan">#FFFFFF</color>
 
     <!-- Neutrals -->
     <color name="warm_cream">#FFF8EC</color>

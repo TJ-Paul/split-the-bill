@@ -17,8 +17,8 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     private val _orders = MutableLiveData<List<Order>>(emptyList())
     val orders: LiveData<List<Order>> = _orders
 
-    val allUniqueNames = MutableLiveData<Set<String>>(emptySet())
-    val allUniqueFoodItems = MutableLiveData<Set<String>>(emptySet())
+    val allUniqueNames = MutableLiveData<List<String>>(emptyList())
+    val allUniqueFoodItems = MutableLiveData<List<String>>(emptyList())
 
     var restaurantName: String = ""
 
@@ -36,13 +36,23 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
             if (it.foodItem.isNotBlank()) items.add(it.foodItem)
         }
         
-        allUniqueNames.value = names
-        allUniqueFoodItems.value = items
+        allUniqueNames.value = names.sorted()
+        allUniqueFoodItems.value = items.sorted()
         
         prefs.edit()
             .putStringSet("all_names", names)
             .putStringSet("all_items", items)
             .apply()
+    }
+
+    private fun sortOrders(list: List<Order>): List<Order> {
+        return list.sortedWith(compareBy<Order> {
+            when {
+                it.cashback < 0 -> 0 // Less paid
+                it.cashback > 0 -> 1 // Over paid
+                else -> 2            // Settled
+            }
+        }.thenBy { it.friendName.lowercase() })
     }
 
     fun addFriend(name: String, food: String = "", price: Double = 0.0, paid: Double = 0.0) {
@@ -56,7 +66,7 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
                 paid = paid,
                 previousPaid = paid
             )
-            _orders.value = currentList + newOrder
+            _orders.value = sortOrders(currentList + newOrder)
             saveData()
             updateSuggestions()
         }
@@ -69,7 +79,33 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         
         val currentList = _orders.value ?: emptyList()
         val newOrders = nameList.map { Order(friendName = it) }
-        _orders.value = currentList + newOrders
+        _orders.value = sortOrders(currentList + newOrders)
+        saveData()
+        updateSuggestions()
+    }
+
+    fun addFoodToFriends(names: List<String>, food: String, price: Double) {
+        val currentList = (_orders.value ?: emptyList()).toMutableList()
+        val foodFormatted = food.lowercase().trim()
+        
+        names.forEach { name ->
+            val index = currentList.indexOfFirst { it.friendName == name }
+            if (index != -1) {
+                val existing = currentList[index]
+                val newFood = if (existing.foodItem.isBlank()) foodFormatted else "${existing.foodItem}, $foodFormatted"
+                currentList[index] = existing.copy(
+                    foodItem = newFood,
+                    price = existing.price + price
+                )
+            } else {
+                currentList.add(Order(
+                    friendName = name,
+                    foodItem = foodFormatted,
+                    price = price
+                ))
+            }
+        }
+        _orders.value = sortOrders(currentList)
         saveData()
         updateSuggestions()
     }
@@ -77,9 +113,10 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     fun updateOrder(updatedOrder: Order) {
         updatedOrder.foodItem = updatedOrder.foodItem.lowercase().trim()
         val currentList = _orders.value ?: emptyList()
-        _orders.value = currentList.map {
+        val newList = currentList.map {
             if (it.id == updatedOrder.id) updatedOrder else it
         }
+        _orders.value = sortOrders(newList)
         saveData()
     }
 
@@ -93,7 +130,7 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         val names = prefs.getStringSet("all_names", emptySet())?.toMutableSet() ?: mutableSetOf()
         if (names.remove(name)) {
             prefs.edit().putStringSet("all_names", names).apply()
-            allUniqueNames.value = names
+            allUniqueNames.value = names.sorted()
         }
     }
 
@@ -161,8 +198,10 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun generateFullReceiptText(): String {
-        val ordersList = _orders.value ?: return "No orders found."
-        if (ordersList.isEmpty()) return "No friends or orders added yet."
+        val rawOrders = _orders.value ?: return "No orders found."
+        if (rawOrders.isEmpty()) return "No friends or orders added yet."
+        
+        val ordersList = sortOrders(rawOrders)
         
         // Dynamic column width calculation based on content
         var maxNameLen = "FRIEND".length
@@ -294,8 +333,8 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     private fun loadData() {
         try {
             restaurantName = prefs.getString("restaurant_name", "") ?: ""
-            allUniqueNames.value = prefs.getStringSet("all_names", emptySet())?.toSet() ?: emptySet()
-            allUniqueFoodItems.value = prefs.getStringSet("all_items", emptySet())?.toSet() ?: emptySet()
+            allUniqueNames.value = prefs.getStringSet("all_names", emptySet())?.sorted() ?: emptyList()
+            allUniqueFoodItems.value = prefs.getStringSet("all_items", emptySet())?.sorted() ?: emptyList()
 
             val jsonString = prefs.getString("orders_json", null)
             if (jsonString != null) {
@@ -313,7 +352,7 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
                         isDone = jsonObject.optBoolean("isDone", false)
                     ))
                 }
-                _orders.value = list
+                _orders.value = sortOrders(list)
             }
         } catch (e: Exception) {
             e.printStackTrace()

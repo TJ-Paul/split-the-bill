@@ -35,8 +35,10 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.SecondFragment) {
                 binding.fab.visibility = View.GONE
+                binding.fabAddFood.visibility = View.GONE
             } else {
                 binding.fab.visibility = View.VISIBLE
+                binding.fabAddFood.visibility = View.VISIBLE
             }
         }
 
