@@ -25,6 +25,8 @@ You can download the latest stable version of the app directly or build it yours
 
 *   **👥 Effortless Friend Management**: Add friends individually or in bulk. The app remembers frequently used names to make the process even faster.
 *   **🍕 Order Details**: Track specific food items, their prices, and how much each friend has already paid.
+*   **➕ Quick Add Food**: A dedicated button to quickly add the same food item and price to multiple selected friends simultaneously—perfect for group orders.
+*   **🔢 Smart Sorting**: Lists are automatically organized lexicographically and by payment status: **DUE** at the top, followed by **REFUND**, and **Settled** at the bottom.
 *   **💰 Automated Calculations**: Instant calculation of "DUE" or "REFUND" amounts for each person.
 *   **📊 Session Summary**: View an overall summary of the total bill, total paid, and the net status (Overall Due or Refund).
 *   **📜 History & Logs**: Save your dining sessions with timestamps and restaurant names. Review past outings anytime in the History section.
