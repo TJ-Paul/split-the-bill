@@ -126,8 +126,9 @@
     <style name="Widget.App.Chip.Paid" parent="Widget.MaterialComponents.Chip.Action">
         <item name="chipBackgroundColor">@color/color_success_container</item>
         <item name="android:textColor">@color/palette_green_dark</item>
-        <item name="chipIcon">@android:drawable/checkbox_on_background</item>
+        <item name="chipIcon">@drawable/ic_check_circle</item>
         <item name="chipIconTint">@color/palette_green_dark</item>
+        <item name="chipIconSize">18dp</item>
     </style>
 
     <style name="Widget.App.Chip.Unpaid" parent="Widget.MaterialComponents.Chip.Action">

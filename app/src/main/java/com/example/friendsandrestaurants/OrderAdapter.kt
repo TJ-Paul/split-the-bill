@@ -154,7 +154,10 @@ class OrderAdapter(
                 binding.statusChip.text = "Paid"
                 binding.statusChip.setChipBackgroundColorResource(R.color.color_success_container)
                 binding.statusChip.setTextColor(binding.root.context.getColor(R.color.palette_green_dark))
-                binding.statusChip.setChipIconResource(android.R.drawable.checkbox_on_background)
+                binding.statusChip.setChipIconResource(R.drawable.ic_check_circle)
+                binding.statusChip.chipIconTint = android.content.res.ColorStateList.valueOf(
+                    binding.root.context.getColor(R.color.palette_green_dark)
+                )
                 binding.statusChip.isChipIconVisible = true
             } else {
                 binding.statusChip.text = "Unpaid"

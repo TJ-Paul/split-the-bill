@@ -49,7 +49,6 @@
             style="@style/Widget.App.Chip.Unpaid"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:checkable="true"
             android:text="Unpaid"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="parent"
