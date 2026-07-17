@@ -61,7 +61,7 @@ You can download the latest stable version of the app directly or build it yours
 
 <h3 align="left">Turjjo Paul</h3>
 <p align="left">
-Computer Science & Engineering Student at <b>Bangladesh University of Engineering and Technology (BUET)</b> — Class of 2023.
+Computer Science & Engineering Student at <b>Bangladesh University of Engineering and Technology (BUET)</b>
 </p>
 
 - 🛠 Expertise in **Kotlin, Java, JavaScript, C, C++, and Python**.
