@@ -161,4 +161,54 @@
     <string name="copied">Copied to clipboard</string>
     <string name="share_chooser">Share receipt</string>
     <string name="receipt_clipboard_label">Receipt</string>
+
+    <!-- Share with friends (local web page) -->
+    <string name="action_share_live">Share with friends</string>
+    <string name="share_title">Let friends add their orders</string>
+    <string name="share_status_starting">Starting…</string>
+    <string name="share_status_live">Live · friends can add orders</string>
+    <plurals name="share_status_viewers">
+        <item quantity="one">Live · %d person viewing</item>
+        <item quantity="other">Live · %d people viewing</item>
+    </plurals>
+    <string name="share_status_failed">Couldn\'t start sharing</string>
+    <string name="share_failed_body">Something on this phone blocked the bill page from starting. Try again, or restart the app.</string>
+    <string name="share_retry">Try again</string>
+    <string name="share_qr_desc">QR code that opens the bill page</string>
+    <string name="share_network_hotspot">On your hotspot</string>
+    <string name="share_network_wifi">On your Wi-Fi</string>
+    <string name="share_network_other">On %1$s</string>
+    <string name="share_chip_hotspot">Hotspot</string>
+    <string name="share_chip_wifi">Wi-Fi</string>
+    <string name="share_chip_label">%1$s · %2$s</string>
+    <string name="share_copy_link">Copy link</string>
+    <string name="share_send_link">Send link</string>
+    <string name="share_link_message">Add what you ordered to the bill: %1$s\n(Open it while connected to the same Wi-Fi or hotspot.)</string>
+    <string name="share_link_copied">Link copied</string>
+    <string name="share_link_clipboard_label">Bill link</string>
+    <string name="share_no_network_title">Turn on your hotspot or join Wi-Fi</string>
+    <string name="share_no_network_body">Your friends need to be on the same network as this phone. Turn on your hotspot and have them connect to it, or join the same Wi-Fi as them.</string>
+    <string name="share_open_hotspot_settings">Open hotspot settings</string>
+    <string name="share_steps">1.  Friends connect to the same Wi-Fi as you, or to your hotspot.\n2.  They scan this code with their phone camera.\n3.  Their orders appear on your phone right away. You can still change anything.</string>
+    <string name="share_tip">Page won\'t open? Ask them to turn off mobile data, or use your hotspot instead. Some restaurant Wi-Fi stops phones from seeing each other.</string>
+    <string name="share_done">Done</string>
+    <string name="share_stop">Stop sharing</string>
+    <string name="share_stopped">Stopped sharing. Orders already added stay on the bill.</string>
+    <string name="share_show_qr">Show QR</string>
+    <string name="share_banner_starting">Starting to share…</string>
+    <string name="share_banner_live">Sharing live · friends can add orders</string>
+    <plurals name="share_banner_viewers">
+        <item quantity="one">Sharing live · %d person viewing</item>
+        <item quantity="other">Sharing live · %d people viewing</item>
+    </plurals>
+    <string name="share_banner_desc">Bill is shared on your network. Tap to show the QR code.</string>
+    <string name="share_notification_title">Sharing your bill</string>
+    <string name="share_notification_text">Friends on your Wi-Fi or hotspot can add their orders</string>
+    <plurals name="share_notification_viewers">
+        <item quantity="one">%d person is viewing the bill</item>
+        <item quantity="other">%d people are viewing the bill</item>
+    </plurals>
+    <string name="share_channel_name">Bill sharing</string>
+    <string name="share_channel_description">Shown while friends can add orders from their phones</string>
+    <string name="guest_order_desc">%1$s, added from their phone</string>
 </resources>

@@ -1,0 +1,1369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#FFF8EC">
+<meta name="format-detection" content="telephone=no">
+<title>Split the Bill</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%234F7A77'/%3E%3Cpath fill='white' d='M7 5h10v14l-1.7-1.2L13.7 19 12 17.8 10.3 19l-1.6-1.2L7 19zm2 3v1.5h6V8zm0 3v1.5h6V11zm0 3v1.5h4V14z'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #FFF8EC;
+    --card: #FFFDF8;
+    --paper: #FFFFFF;
+    --ink: #2E2A26;
+    --ink-2: #6B6459;
+    --ink-3: #8C8478;
+    --line: #E6DCCB;
+    --hair: #EFE6D6;
+    --field: #A39A8B;
+    --primary: #4F7A77;
+    --primary-dark: #3B5F5C;
+    --primary-c: #DCEAE8;
+    --on-primary-c: #173634;
+    --accent: #C96B36;
+    --accent-dark: #A4532A;
+    --accent-c: #FBE3D2;
+    --due: #B3261E;
+    --due-c: #FCE4E1;
+    --ok: #2F6B1F;
+    --ok-c: #E3F0D6;
+    --settled-c: #EFE8DC;
+    --warn-c: #FBF0D2;
+    --warn: #6B5208;
+    --radius: 18px;
+    --shadow: 0 1px 2px rgba(46, 42, 38, .06), 0 4px 14px rgba(46, 42, 38, .05);
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Bengali", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  [hidden] { display: none !important; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 0 16px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ---------- header ---------- */
+  .hero { padding: calc(14px + env(safe-area-inset-top)) 0 6px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--primary-dark); letter-spacing: .2px; }
+  .brand svg { width: 22px; height: 22px; }
+  .conn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2);
+          background: var(--settled-c); padding: 4px 10px; border-radius: 999px; }
+  .conn i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); display: inline-block; }
+  .conn.live { background: var(--ok-c); color: var(--ok); }
+  .conn.live i { background: var(--ok); animation: pulse 2s infinite; }
+  .conn.bad { background: var(--due-c); color: var(--due); }
+  .conn.bad i { background: var(--due); }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(47,107,31,.45); } 70% { box-shadow: 0 0 0 7px rgba(47,107,31,0); } 100% { box-shadow: 0 0 0 0 rgba(47,107,31,0); } }
+  h1 { font-size: 26px; line-height: 1.2; margin: 14px 0 2px; letter-spacing: -.2px; overflow-wrap: anywhere; }
+  .meta { margin: 0; color: var(--ink-2); font-size: 14px; }
+
+  .banner { border-radius: 14px; padding: 12px 14px; margin: 12px 0 0; font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
+  .banner.warn { background: var(--due-c); color: var(--due); font-weight: 600; }
+  .banner.welcome { background: var(--primary-c); color: var(--on-primary-c); }
+  .banner.welcome p { margin: 0; flex: 1; }
+  .banner .x { border: 0; background: transparent; color: inherit; font-weight: 700; padding: 0 4px; min-height: 32px; text-decoration: underline; }
+
+  /* ---------- sections ---------- */
+  section { margin-top: 20px; }
+  .section-title { font-size: 13px; font-weight: 700; color: var(--ink-2); text-transform: uppercase; letter-spacing: .6px; margin: 0 4px 8px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; }
+  .card + .card { margin-top: 12px; }
+
+  /* ---------- buttons ---------- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px;
+         border-radius: 14px; border: 0; font-weight: 650; font-size: 16px; text-decoration: none; transition: filter .15s, transform .05s; }
+  .btn:active { transform: scale(.98); }
+  .btn[disabled] { opacity: .6; cursor: default; }
+  .btn.primary { background: var(--primary); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.05); }
+  .btn.tonal { background: var(--primary-c); color: var(--on-primary-c); }
+  .btn.accent { background: var(--accent-c); color: var(--accent-dark); }
+  .btn.ghost { background: transparent; color: var(--primary-dark); }
+  .btn.danger { background: transparent; color: var(--due); }
+  .btn.block { width: 100%; }
+  .btn.small { min-height: 40px; font-size: 14px; padding: 0 14px; border-radius: 12px; }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .link-btn { background: none; border: 0; color: var(--primary-dark); font-weight: 650; padding: 10px 4px; min-height: 44px; text-align: left; }
+  :focus-visible { outline: 3px solid rgba(79,122,119,.45); outline-offset: 2px; }
+
+  /* ---------- editor ---------- */
+  .editor h2 { margin: 0; font-size: 20px; }
+  .editor .lead { margin: 4px 0 0; color: var(--ink-2); font-size: 14px; }
+  .step { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff;
+          font-size: 12px; font-weight: 800; flex: none; }
+  .label { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; margin: 18px 0 8px; }
+  .input { width: 100%; min-height: 48px; padding: 10px 12px; border: 1.5px solid var(--field); border-radius: 12px; background: var(--paper);
+           font-size: 16px; outline: none; transition: border-color .15s, box-shadow .15s; }
+  .input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,122,119,.18); }
+  .input[aria-invalid="true"] { border-color: var(--due); }
+  .input::placeholder { color: #AAA196; }
+  .err { color: var(--due); font-size: 13px; font-weight: 600; margin-top: 6px; }
+  .err:empty { display: none; }
+  .items { display: flex; flex-direction: column; gap: 10px; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) 7.6rem 44px; gap: 8px; align-items: start; }
+  .row .full { grid-column: 1 / -1; }
+  .price { position: relative; }
+  .price .input { padding-right: 30px; text-align: right; }
+  .price .unit { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-size: 13px; pointer-events: none; }
+  .icon-btn { width: 44px; height: 48px; border: 0; border-radius: 12px; background: transparent; color: var(--ink-3); display: grid; place-items: center; }
+  .icon-btn:hover { background: var(--settled-c); color: var(--due); }
+  .icon-btn svg { width: 22px; height: 22px; }
+  .calc { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: -2px; }
+  .calc .ops { display: flex; gap: 6px; }
+  .calc .ops button { width: 44px; height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--paper); font-size: 19px; font-weight: 700; color: var(--primary-dark); }
+  .calc .ops button:active { background: var(--primary-c); }
+  .calc .out { margin-left: auto; font-weight: 700; color: var(--primary-dark); font-size: 15px; }
+  .calc .hint { font-size: 12px; color: var(--ink-3); }
+  .note { font-size: 13px; color: var(--warn); background: var(--warn-c); border-radius: 10px; padding: 6px 10px; }
+  .add-item { margin-top: 10px; width: 100%; min-height: 46px; border: 1.5px dashed var(--field); border-radius: 12px; background: transparent;
+              color: var(--primary-dark); font-weight: 650; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .add-item svg { width: 18px; height: 18px; }
+  .tip { font-size: 13px; color: var(--ink-2); background: var(--settled-c); border-radius: 12px; padding: 10px 12px; margin: 12px 0 0; }
+  .tip b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .total-row { display: flex; justify-content: space-between; align-items: baseline; margin: 16px 2px 12px; padding-top: 12px; border-top: 1px dashed var(--line); }
+  .total-row span { color: var(--ink-2); font-weight: 600; }
+  .total-row b { font-size: 22px; }
+  .notice { background: var(--warn-c); color: var(--warn); border-radius: 12px; padding: 10px 12px; font-size: 14px; margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .notice button { border: 0; background: transparent; color: var(--warn); font-weight: 750; text-decoration: underline; padding: 4px 0; }
+  .form-err { margin: 0 0 12px; }
+  .editor-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; }
+  .editor .submit .step { background: rgba(255,255,255,.25); }
+
+  /* ---------- my order cards ---------- */
+  .mo-head { display: flex; align-items: center; gap: 12px; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 750; font-size: 14px; flex: none; }
+  .mo-name { font-weight: 750; font-size: 18px; overflow-wrap: anywhere; }
+  .mo-sub { font-size: 13px; color: var(--ok); font-weight: 600; }
+  .mo-items { list-style: none; margin: 12px 0 0; padding: 0; }
+  .mo-items li, .r-items li { display: flex; align-items: baseline; gap: 6px; padding: 3px 0; }
+  .mo-items .n, .r-items .n { overflow-wrap: anywhere; }
+  .leader { flex: 1; border-bottom: 2px dotted var(--line); transform: translateY(-4px); min-width: 12px; }
+  .mo-total { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px dashed var(--line); margin-top: 10px; padding-top: 10px; }
+  .mo-total b { font-size: 20px; }
+  .mo-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .pill { display: inline-block; border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+  .pill.due { background: var(--due-c); color: var(--due); }
+  .pill.ok { background: var(--ok-c); color: var(--ok); }
+  .pill.muted { background: var(--settled-c); color: var(--ink-2); }
+  .ml-auto { margin-left: auto; }
+
+  /* ---------- receipt ---------- */
+  .receipt { position: relative; background: var(--paper); margin: 14px 2px 18px; padding: 18px 16px 16px;
+             filter: drop-shadow(0 1px 1px rgba(46,42,38,.10)) drop-shadow(0 6px 14px rgba(46,42,38,.06)); }
+  .receipt::before, .receipt::after { content: ""; position: absolute; left: 0; right: 0; height: 10px;
+             background: radial-gradient(circle at 6px 10px, transparent 5.5px, var(--paper) 6px) repeat-x; background-size: 12px 10px; }
+  .receipt::before { top: -10px; transform: scaleY(-1); }
+  .receipt::after { bottom: -10px; }
+  .r-head { text-align: center; padding-bottom: 12px; border-bottom: 2px dashed var(--line); }
+  .r-title { font-weight: 800; font-size: 18px; letter-spacing: .3px; text-transform: uppercase; overflow-wrap: anywhere; }
+  .r-meta { color: var(--ink-2); font-size: 13px; margin-top: 2px; }
+  .r-person { padding: 14px 0; border-bottom: 1px dashed var(--line); }
+  .r-person.mine { background: linear-gradient(90deg, var(--primary-c), transparent 85%); margin: 0 -16px; padding: 14px 16px; }
+  .r-line { display: flex; align-items: center; gap: 10px; }
+  .r-line .who { font-weight: 750; overflow-wrap: anywhere; }
+  .r-line .amt { margin-left: auto; font-weight: 800; white-space: nowrap; }
+  .you { font-size: 11px; font-weight: 800; color: #fff; background: var(--primary); border-radius: 6px; padding: 1px 6px; letter-spacing: .4px; }
+  .r-items { list-style: none; margin: 6px 0 0 48px; padding: 0; color: var(--ink-2); font-size: 15px; }
+  .r-items .p { white-space: nowrap; }
+  .r-items .x { color: var(--ink-3); font-size: 12px; margin-left: 4px; }
+  .r-empty-items { margin: 6px 0 0 48px; color: var(--ink-3); font-size: 14px; font-style: italic; }
+  .r-foot { display: flex; align-items: center; gap: 8px; margin: 8px 0 0 48px; flex-wrap: wrap; }
+  .r-foot .btn { margin-left: auto; }
+  .r-totals { padding-top: 12px; }
+  .r-totals div { display: flex; justify-content: space-between; padding: 2px 0; color: var(--ink-2); }
+  .r-totals .grand { color: var(--ink); font-weight: 800; font-size: 19px; border-bottom: 2px dashed var(--line); padding-bottom: 8px; margin-bottom: 6px; }
+  .r-totals .due b { color: var(--due); }
+  .r-totals .okv b { color: var(--ok); }
+  .r-nobody { text-align: center; color: var(--ink-2); padding: 22px 8px; }
+  .r-nobody b { display: block; color: var(--ink); font-size: 17px; margin-bottom: 4px; }
+
+  /* ---------- help ---------- */
+  details.help { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 0 16px; margin: 6px 0 28px; }
+  details.help summary { min-height: 52px; display: flex; align-items: center; gap: 8px; font-weight: 700; cursor: pointer; list-style: none; }
+  details.help summary::-webkit-details-marker { display: none; }
+  details.help summary::after { content: "+"; margin-left: auto; font-size: 22px; color: var(--ink-3); }
+  details.help[open] summary::after { content: "−"; }
+  details.help ol, details.help ul { margin: 0 0 12px; padding-left: 22px; color: var(--ink-2); font-size: 15px; }
+  details.help li { margin: 4px 0; }
+  details.help b { color: var(--ink); }
+  details.help h3 { font-size: 14px; margin: 10px 0 6px; }
+
+  /* ---------- skeleton ---------- */
+  .loading { text-align: center; color: var(--ink-2); padding: 36px 12px; }
+  .spinner { width: 28px; height: 28px; border: 3px solid var(--primary-c); border-top-color: var(--primary); border-radius: 50%;
+             margin: 0 auto 12px; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- toast & sheet ---------- */
+  .toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom)); transform: translate(-50%, 20px); opacity: 0;
+           background: var(--ink); color: #fff; padding: 12px 16px; border-radius: 14px; font-size: 15px; font-weight: 600;
+           max-width: calc(100% - 32px); width: max-content; box-shadow: 0 8px 24px rgba(0,0,0,.2); transition: opacity .2s, transform .2s; z-index: 30; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  .scrim { position: fixed; inset: 0; background: rgba(30, 26, 22, .45); z-index: 40; display: flex; align-items: flex-end; justify-content: center; }
+  .sheet { background: var(--card); width: 100%; max-width: 560px; border-radius: 22px 22px 0 0; padding: 22px 18px calc(18px + env(safe-area-inset-bottom));
+           box-shadow: 0 -8px 30px rgba(0,0,0,.18); animation: up .2s ease-out; }
+  @keyframes up { from { transform: translateY(30px); opacity: .5; } to { transform: none; opacity: 1; } }
+  .sheet h3 { margin: 0 0 6px; font-size: 19px; }
+  .sheet p { margin: 0 0 16px; color: var(--ink-2); }
+  .sheet .actions { display: flex; flex-direction: column; gap: 8px; }
+
+  .flash { animation: flash 1.2s ease-out; }
+  @keyframes flash { 0% { box-shadow: 0 0 0 3px var(--accent); } 100% { box-shadow: var(--shadow); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+  @media (max-width: 360px) {
+    .row { grid-template-columns: minmax(0, 1fr) 6.6rem 40px; gap: 6px; }
+    .r-items, .r-foot, .r-empty-items { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="topbar">
+      <span class="brand">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#4F7A77"/><path fill="#fff" d="M7 5h10v14l-1.7-1.2L13.7 19 12 17.8 10.3 19l-1.6-1.2L7 19zm2 3v1.5h6V8zm0 3v1.5h6V11zm0 3v1.5h4V14z"/></svg>
+        Split the Bill
+      </span>
+      <span id="conn" class="conn" role="status" aria-live="polite"><i></i><span id="connText">Connecting…</span></span>
+    </div>
+    <h1 id="title">Tonight's bill</h1>
+    <p id="meta" class="meta">Add what you ordered. It shows up on the host's phone instantly.</p>
+  </header>
+
+  <div id="offline" class="banner warn" role="alert" hidden>
+    <span>Can't reach the host's phone. Make sure you're still on the same Wi‑Fi or hotspot. Trying again…</span>
+  </div>
+
+  <div id="welcome" class="banner welcome" hidden>
+    <p>👋 <b>Welcome!</b> Type your name and what you ordered below, then tap the big button. Had the same as someone? Tap <b>Copy order</b> on theirs further down.</p>
+    <button type="button" class="x" id="welcomeOk">Got it</button>
+  </div>
+
+  <main>
+    <section id="mine" aria-labelledby="mineTitle">
+      <h2 class="section-title" id="mineTitle" hidden>Your order</h2>
+      <div id="loading" class="card loading"><div class="spinner"></div>Opening the bill…</div>
+      <div id="mineCards"></div>
+      <div id="editorHost"></div>
+      <button type="button" class="link-btn" id="addOther" hidden>+ Add an order for someone without a phone</button>
+    </section>
+
+    <section aria-labelledby="everyoneTitle">
+      <h2 class="section-title" id="everyoneTitle">Everyone's orders</h2>
+      <div class="receipt" id="receipt">
+        <div class="r-head">
+          <div class="r-title" id="rTitle">Bill</div>
+          <div class="r-meta" id="rMeta"></div>
+        </div>
+        <div id="rBody"></div>
+        <div class="r-totals" id="rTotals"></div>
+      </div>
+    </section>
+
+    <details class="help" id="help">
+      <summary>❓ How does this work?</summary>
+      <ol>
+        <li>Type <b>your name</b> and <b>what you ordered</b> with its price from the menu.</li>
+        <li>Tap <b>Add me to the bill</b>. The person who shared this page sees it on their phone straight away.</li>
+        <li>Need to change something? Tap <b>Edit</b> on your order any time.</li>
+      </ol>
+      <h3>Handy tricks</h3>
+      <ul>
+        <li>Prices can be sums: <b>120+80</b>, <b>250×2</b>. Use the <b>+ − × ÷</b> keys under the price box.</li>
+        <li>Shared a dish? Type the total divided by the people: <b>900÷3</b>.</li>
+        <li>Had the same as a friend? Tap <b>Copy order</b> on theirs, then change what's different.</li>
+        <li>You can only change orders added from this phone. The host can change everything.</li>
+      </ul>
+    </details>
+  </main>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<datalist id="knownItems"></datalist>
+
+<script>
+'use strict';
+
+/* ======================================================================
+   Calculator: same rules as PriceCalculator.kt in the app.
+   ====================================================================== */
+// <calc>
+function normalizeExpr(text) {
+  var out = '';
+  var s = String(text == null ? '' : text).trim();
+  for (var i = 0; i < s.length; i++) {
+    var ch = s[i], code = s.charCodeAt(i);
+    if (ch === '×' || ch === 'x' || ch === 'X' || ch === '✕') out += '*';
+    else if (ch === '÷') out += '/';
+    else if (ch === '−' || ch === '–') out += '-';
+    else if (code >= 0x09E6 && code <= 0x09EF) out += String(code - 0x09E6); // Bengali digits
+    else if (code >= 0x0966 && code <= 0x096F) out += String(code - 0x0966); // Devanagari
+    else if (code >= 0x0660 && code <= 0x0669) out += String(code - 0x0660); // Arabic-Indic
+    else if (code >= 0x06F0 && code <= 0x06F9) out += String(code - 0x06F0); // Eastern Arabic-Indic
+    else out += ch;
+  }
+  return out;
+}
+
+function cleanExpr(expr) {
+  var s = String(expr).trim();
+  if (s.toLowerCase().endsWith('tk')) s = s.slice(0, -2).trim();
+  return s;
+}
+
+function hasOperators(expr) {
+  return /[+\-*\/]/.test(cleanExpr(normalizeExpr(expr)));
+}
+
+/** Returns {ok, value, empty}. */
+function evaluate(expr) {
+  var t = cleanExpr(normalizeExpr(expr));
+  if (t === '') return { ok: true, value: 0, empty: true };
+  if (/[^0-9.+\-*\/\s]/.test(t)) return { ok: false };
+  try {
+    var v = parseTokens(tokenize(t));
+    if (!isFinite(v)) return { ok: false };
+    return { ok: true, value: v };
+  } catch (e) {
+    return { ok: false };
+  }
+}
+
+function isDigit(c) { return c >= '0' && c <= '9'; }
+function isSpace(c) { return /\s/.test(c); }
+function toNumber(s) {
+  var n = Number(s);
+  if (s === '' || isNaN(n)) throw new Error('bad number');
+  return n;
+}
+
+function tokenize(e) {
+  var tokens = [], i = 0, lastWasOpOrStart = true;
+  while (i < e.length) {
+    var c = e[i];
+    if (isSpace(c)) { i++; continue; }
+    if (c === '+' || c === '-' || c === '*' || c === '/') {
+      var unary = (c === '+' || c === '-') && lastWasOpOrStart;
+      if (unary) {
+        var last = tokens[tokens.length - 1];
+        var atStart = tokens.length === 0;
+        var afterMulDiv = !!last && last.op && (last.op === '*' || last.op === '/') && c === '-';
+        if (!atStart && !afterMulDiv) throw new Error('two operators');
+        var start = i;
+        i++;
+        while (i < e.length && isSpace(e[i])) i++;
+        if (i >= e.length || (!isDigit(e[i]) && e[i] !== '.')) throw new Error('sign without number');
+        var dot = false;
+        while (i < e.length && (isDigit(e[i]) || e[i] === '.')) {
+          if (e[i] === '.') { if (dot) throw new Error('two dots'); dot = true; }
+          i++;
+        }
+        tokens.push({ num: toNumber(e.slice(start, i).replace(/ /g, '')) });
+        lastWasOpOrStart = false;
+      } else {
+        tokens.push({ op: c });
+        lastWasOpOrStart = true;
+        i++;
+      }
+    } else if (isDigit(c) || c === '.') {
+      var s2 = i, dot2 = false;
+      while (i < e.length && (isDigit(e[i]) || e[i] === '.')) {
+        if (e[i] === '.') { if (dot2) throw new Error('two dots'); dot2 = true; }
+        i++;
+      }
+      tokens.push({ num: toNumber(e.slice(s2, i)) });
+      lastWasOpOrStart = false;
+    } else {
+      throw new Error('unexpected ' + c);
+    }
+  }
+  return tokens;
+}
+
+function parseTokens(tokens) {
+  if (!tokens.length) throw new Error('empty');
+  var reduced = [], i = 0;
+  while (i < tokens.length) {
+    var t = tokens[i];
+    if (t.op === '*' || t.op === '/') {
+      var prev = reduced[reduced.length - 1];
+      if (!prev || !('num' in prev)) throw new Error('operator placement');
+      var next = tokens[i + 1];
+      if (!next || !('num' in next)) throw new Error('number expected');
+      reduced.pop();
+      if (t.op === '/' && next.num === 0) throw new Error('division by zero');
+      reduced.push({ num: t.op === '*' ? prev.num * next.num : prev.num / next.num });
+      i += 2;
+    } else {
+      reduced.push(t);
+      i++;
+    }
+  }
+  if (!('num' in reduced[0])) throw new Error('must start with number');
+  var result = reduced[0].num;
+  for (var j = 1; j < reduced.length; j += 2) {
+    var op = reduced[j], n = reduced[j + 1];
+    if (!op || !op.op || !n || !('num' in n)) throw new Error('operator sequence');
+    if (op.op === '+') result += n.num;
+    else if (op.op === '-') result -= n.num;
+    else throw new Error('operator');
+  }
+  return result;
+}
+// </calc>
+
+/* ======================================================================
+   Helpers
+   ====================================================================== */
+var $ = function (id) { return document.getElementById(id); };
+var store = {
+  get: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+  set: function (k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* private mode */ } }
+};
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function round2(v) { var r = Math.round(v * 100) / 100; return r === 0 ? 0 : r; }
+var moneyFmt = (function () {
+  try { return new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 }); } catch (e) { return null; }
+})();
+function money(v) { var r = round2(v); return moneyFmt ? moneyFmt.format(r) : String(r); }
+function tk(v) { return money(v) + ' tk'; }
+/** Plain number for a price box: 665, 333.33 (no thousands separators). */
+function plain(v) { return Order0(v) ? '' : String(round2(v)); }
+function Order0(v) { return Math.abs(v) < 0.005; }
+function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+function randomHex(bytes) {
+  var a = new Uint8Array(bytes);
+  if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(a);
+  else for (var i = 0; i < bytes; i++) a[i] = Math.floor(Math.random() * 256);
+  return Array.prototype.map.call(a, function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+}
+function normName(s) { return String(s || '').trim().replace(/\s+/g, ' ').toLowerCase(); }
+function baseItemName(s) { return String(s || '').replace(/\s*\(shared ÷\d+\)$/, '').trim().toLowerCase(); }
+
+var AVATAR_COLORS = ['#4F7A77', '#A4532A', '#4E7A35', '#8A6D1E', '#4F5F86', '#85506F'];
+/** Same colour the app gives this name (Java String.hashCode). */
+function avatarColor(name) {
+  var s = String(name).toLowerCase(), h = 0;
+  for (var i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  return AVATAR_COLORS[((h % 6) + 6) % 6];
+}
+// Built at runtime so older browsers without Unicode regex support fall back instead of failing to load.
+var LETTER = (function () {
+  try { return new RegExp('[\\p{L}\\p{N}]', 'u'); } catch (e) { return /[A-Za-z0-9\u00C0-\uFFFF]/; }
+})();
+function initials(name) {
+  var words = String(name).split(/[\s,.\-]+/).filter(function (w) { return LETTER.test(w); });
+  var letters = words.slice(0, 2).map(function (w) { var m = w.match(LETTER); return m ? m[0].toUpperCase() : ''; }).join('');
+  return letters || '?';
+}
+function avatarHtml(name) {
+  return '<span class="avatar" aria-hidden="true" style="background:' + avatarColor(name) + '">' + esc(initials(name)) + '</span>';
+}
+var ICON = {
+  plus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>',
+  close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>'
+};
+
+function statusPill(o) {
+  if (o.isPaid) return '<span class="pill ok">Paid ✓</span>';
+  if (Order0(o.total) && Order0(o.paid)) return '<span class="pill muted">No price yet</span>';
+  if (o.balance < 0) return '<span class="pill due">Due ' + esc(tk(-o.balance)) + '</span>';
+  if (o.balance > 0) return '<span class="pill ok">Gets back ' + esc(tk(o.balance)) + '</span>';
+  return '<span class="pill ok">Settled ✓</span>';
+}
+
+var toastTimer = null;
+function toast(text) {
+  var el = $('toast');
+  el.textContent = text;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.classList.remove('show'); }, 3600);
+}
+
+/** A bottom sheet with a title, text and buttons. */
+function sheet(opts) {
+  var lastFocus = document.activeElement;
+  var scrim = document.createElement('div');
+  scrim.className = 'scrim';
+  var box = document.createElement('div');
+  box.className = 'sheet';
+  box.setAttribute('role', 'dialog');
+  box.setAttribute('aria-modal', 'true');
+  box.setAttribute('aria-labelledby', 'sheetTitle');
+  box.innerHTML = '<h3 id="sheetTitle">' + esc(opts.title) + '</h3>' + (opts.text ? '<p>' + esc(opts.text) + '</p>' : '') + '<div class="actions"></div>';
+  var actions = box.querySelector('.actions');
+  function close() {
+    document.removeEventListener('keydown', onKey);
+    scrim.remove();
+    if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
+  }
+  function onKey(e) { if (e.key === 'Escape') close(); }
+  opts.actions.concat([{ label: opts.cancelLabel || 'Cancel', kind: 'ghost' }]).forEach(function (a) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn block ' + (a.kind || 'tonal');
+    b.textContent = a.label;
+    b.addEventListener('click', function () { close(); if (a.onClick) a.onClick(); });
+    actions.appendChild(b);
+  });
+  scrim.addEventListener('click', function (e) { if (e.target === scrim) close(); });
+  document.addEventListener('keydown', onKey);
+  scrim.appendChild(box);
+  document.body.appendChild(scrim);
+  actions.querySelector('button').focus();
+}
+
+/* ======================================================================
+   Identity: a random key in this browser marks the orders it added.
+   ====================================================================== */
+var TOKEN = (function () {
+  var t = store.get('stb.token');
+  if (!/^[a-f0-9]{32}$/.test(t || '')) { t = randomHex(16); store.set('stb.token', t); }
+  return t;
+})();
+
+/* ======================================================================
+   State from the host's phone
+   ====================================================================== */
+var state = null;       // latest bill
+var editor = null;      // the open add/edit form, if any
+var knownMine = {};     // ids of my orders in the last state, to notice removals
+var pollGen = 0, pollAbort = null;
+
+function myOrders() { return state ? state.orders.filter(function (o) { return o.mine; }) : []; }
+function findOrder(id) { return state ? state.orders.find(function (o) { return o.id === id; }) : null; }
+function sig(o) { return JSON.stringify([o.name, o.items.map(function (i) { return [i.name, i.price]; })]); }
+
+function applyState(data) {
+  if (!data || !Array.isArray(data.orders)) return;
+  if (state && typeof data.rev === 'number' && data.rev <= state.rev) return; // not newer than what we show
+  var first = !state;
+  state = data;
+
+  var name = (state.restaurant || '').trim();
+  $('title').textContent = name || "Tonight's bill";
+  document.title = (name || 'Bill') + ' · Split the Bill';
+  $('loading').hidden = true;
+
+  // Orders of mine that disappeared were removed by the host.
+  var nowMine = {};
+  myOrders().forEach(function (o) { nowMine[o.id] = o.name; });
+  Object.keys(knownMine).forEach(function (id) {
+    if (!nowMine[id] && !(editor && editor.deleting === id)) toast('The host took ' + knownMine[id] + ' off the bill.');
+  });
+  knownMine = nowMine;
+
+  updateKnownItems();
+  if (first) restoreDraft();
+  renderMine();
+  renderReceipt();
+  checkEditorConflict();
+  if (first && store.get('stb.welcomed') !== '1' && myOrders().length === 0) $('welcome').hidden = false;
+}
+
+function setOnline(ok, failures) {
+  var conn = $('conn');
+  conn.classList.toggle('live', ok);
+  conn.classList.toggle('bad', !ok && failures >= 2);
+  $('connText').textContent = ok ? 'Live' : 'Reconnecting…';
+  $('offline').hidden = ok || failures < 2;
+}
+
+async function pollLoop() {
+  var gen = ++pollGen;
+  var failures = 0;
+  while (gen === pollGen) {
+    var ctrl = window.AbortController ? new AbortController() : null;
+    pollAbort = ctrl;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 35000);
+    try {
+      var url = '/api/state?token=' + TOKEN + (state ? '&since=' + state.rev : '');
+      var res = await fetch(url, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      if (gen !== pollGen) return;
+      failures = 0;
+      setOnline(true, 0);
+      if (!data.unchanged) applyState(data);
+    } catch (e) {
+      clearTimeout(timer);
+      if (gen !== pollGen) return;
+      failures++;
+      setOnline(false, failures);
+      await sleep(Math.min(1000 * failures, 5000));
+    }
+  }
+}
+function restartPoll() {
+  pollGen++;
+  if (pollAbort) pollAbort.abort();
+  pollLoop();
+}
+document.addEventListener('visibilitychange', function () { if (!document.hidden) restartPoll(); });
+window.addEventListener('online', restartPoll);
+window.addEventListener('pageshow', function (e) { if (e.persisted) restartPoll(); });
+
+/* ======================================================================
+   "Your order" cards
+   ====================================================================== */
+function renderMine() {
+  var mine = myOrders();
+  var cards = $('mineCards');
+  var html = '';
+  mine.forEach(function (o) {
+    if (editor && editor.orderId === o.id) return; // being edited below
+    var items = o.items.map(function (i) {
+      return '<li><span class="n">' + esc(i.name || '—') + '</span><span class="leader"></span><span class="num">' + esc(money(i.price)) + '</span></li>';
+    }).join('');
+    html += '<article class="card" data-order="' + esc(o.id) + '">' +
+      '<div class="mo-head">' + avatarHtml(o.name) +
+        '<div><div class="mo-name">' + esc(o.name) + '</div>' +
+        '<div class="mo-sub">' + (o.isPaid ? 'The host marked you as paid' : 'Saved ✓ The host can see this') + '</div></div>' +
+        '<span class="ml-auto">' + statusPill(o) + '</span>' +
+      '</div>' +
+      (items ? '<ul class="mo-items">' + items + '</ul>' : '<p class="r-empty-items" style="margin-left:0">No items yet</p>') +
+      '<div class="mo-total"><span>Total</span><b class="num">' + esc(tk(o.total)) + '</b></div>' +
+      '<div class="mo-actions"><button type="button" class="btn tonal" data-edit="' + esc(o.id) + '">' + ICON.edit + 'Edit</button></div>' +
+    '</article>';
+  });
+  cards.innerHTML = html;
+  $('mineTitle').hidden = !(mine.length || editor);
+  $('mineTitle').textContent = mine.length > 1 ? 'Your orders' : 'Your order';
+  $('addOther').hidden = !(mine.length > 0 && !editor);
+
+  if (!editor && state && mine.length === 0) openEditor({ mode: 'new', focus: false });
+}
+
+$('mineCards').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-edit]');
+  if (!b) return;
+  var o = findOrder(b.getAttribute('data-edit'));
+  if (o) openEditor({ mode: 'edit', order: o });
+});
+$('addOther').addEventListener('click', function () { openEditor({ mode: 'new', forOther: true }); });
+$('welcomeOk').addEventListener('click', function () { $('welcome').hidden = true; store.set('stb.welcomed', '1'); });
+
+/* ======================================================================
+   Receipt of everyone's orders
+   ====================================================================== */
+function renderReceipt() {
+  var orders = state.orders.slice().sort(function (a, b) {
+    return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+  });
+  var s = state.summary || {};
+  var name = (state.restaurant || '').trim();
+  $('rTitle').textContent = name || 'Bill';
+  var date = '';
+  try { date = new Date().toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }); } catch (e) { /* ignore */ }
+  $('rMeta').textContent = [date, orders.length === 1 ? '1 person' : orders.length + ' people'].filter(Boolean).join(' · ');
+
+  if (!orders.length) {
+    $('rBody').innerHTML = '<div class="r-nobody"><b>No orders yet</b>Be the first to add yours! 👆</div>';
+    $('rTotals').innerHTML = '';
+    return;
+  }
+
+  $('rBody').innerHTML = orders.map(function (o) {
+    var items = o.items.map(function (i) {
+      var expr = i.expr ? '<span class="x">(' + esc(i.expr) + ')</span>' : '';
+      return '<li><span class="n">' + esc(i.name || '—') + expr + '</span><span class="leader"></span><span class="p num">' + esc(money(i.price)) + '</span></li>';
+    }).join('');
+    var copy = (!o.mine && o.items.length)
+      ? '<button type="button" class="btn accent small" data-copy="' + esc(o.id) + '" aria-label="Copy ' + esc(o.name) + '\'s order">' + ICON.copy + 'Copy order</button>'
+      : '';
+    return '<article class="r-person' + (o.mine ? ' mine' : '') + '">' +
+      '<div class="r-line">' + avatarHtml(o.name) + '<span class="who">' + esc(o.name) + '</span>' + (o.mine ? '<span class="you">YOU</span>' : '') +
+        '<span class="amt num">' + esc(tk(o.total)) + '</span></div>' +
+      (items ? '<ul class="r-items">' + items + '</ul>' : '<p class="r-empty-items">Nothing added yet</p>') +
+      '<div class="r-foot">' + statusPill(o) + copy + '</div>' +
+    '</article>';
+  }).join('');
+
+  var rows = '<div class="grand"><span>Total bill</span><b class="num">' + esc(tk(s.total || 0)) + '</b></div>' +
+    '<div><span>Paid so far</span><b class="num">' + esc(tk(s.paid || 0)) + '</b></div>';
+  if (!Order0(s.due || 0)) rows += '<div class="due"><span>Still to pay</span><b class="num">' + esc(tk(s.due)) + '</b></div>';
+  if (!Order0(s.refund || 0)) rows += '<div class="okv"><span>To give back</span><b class="num">' + esc(tk(s.refund)) + '</b></div>';
+  $('rTotals').innerHTML = rows;
+}
+
+$('rBody').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-copy]');
+  if (b) copyOrder(b.getAttribute('data-copy'));
+});
+
+/** Item names already on the bill (for suggestions) and their price when everyone paid the same. */
+var knownPrices = {};
+function updateKnownItems() {
+  var names = {}, prices = {};
+  state.orders.forEach(function (o) {
+    o.items.forEach(function (i) {
+      var n = baseItemName(i.name);
+      if (!n) return;
+      names[n] = true;
+      if (i.expr || /\(shared ÷\d+\)$/.test(i.name) || Order0(i.price)) return;
+      if (!(n in prices)) prices[n] = i.price;
+      else if (prices[n] !== null && round2(prices[n]) !== round2(i.price)) prices[n] = null; // different prices: don't guess
+    });
+  });
+  knownPrices = prices;
+  var list = $('knownItems');
+  var html = Object.keys(names).sort().map(function (n) { return '<option value="' + esc(n) + '">'; }).join('');
+  if (list.innerHTML !== html) list.innerHTML = html;
+}
+
+/* ======================================================================
+   Add / edit form
+   ====================================================================== */
+var rowSeq = 0;
+
+function openEditor(opts) {
+  if (editor) closeEditor(true);
+  var order = opts.order || null;
+  var forOther = !!opts.forOther;
+  editor = {
+    mode: opts.mode,
+    orderId: order ? order.id : null,
+    forOther: forOther,
+    baseSig: order ? sig(order) : null,
+    rows: [],
+    busy: false,
+    deleting: null
+  };
+
+  var form = document.createElement('form');
+  form.className = 'card editor';
+  form.noValidate = true;
+  form.innerHTML =
+    '<h2 id="edTitle"></h2>' +
+    '<p class="lead" id="edLead"></p>' +
+    '<label class="label" for="edName"><span class="step">1</span><span id="edNameLabel">Your name</span></label>' +
+    '<input class="input" id="edName" autocomplete="name" autocapitalize="words" enterkeyhint="next" maxlength="40" placeholder="e.g. Rahim" aria-describedby="edNameErr">' +
+    '<div class="err" id="edNameErr"></div>' +
+    '<div class="label" id="edItemsLabel"><span class="step">2</span>What did you order?</div>' +
+    '<div class="items" id="edItems" role="group" aria-labelledby="edItemsLabel"></div>' +
+    '<div class="err" id="edItemsErr"></div>' +
+    '<button type="button" class="add-item" id="edAddItem">' + ICON.plus + 'Add another item</button>' +
+    '<p class="tip">💡 Prices can be sums like <b>120+80</b>. Shared a dish? Type the total ÷ people, like <b>900÷3</b>.</p>' +
+    '<div class="total-row"><span id="edTotalLabel">Your total</span><b class="num" id="edTotal">0 tk</b></div>' +
+    '<div class="notice" id="edNotice" hidden></div>' +
+    '<div class="err form-err" id="edFormErr" role="alert"></div>' +
+    '<button type="submit" class="btn primary block submit" id="edSubmit"><span class="step">3</span><span id="edSubmitText"></span></button>' +
+    '<div class="editor-actions">' +
+      '<button type="button" class="btn ghost" id="edCancel">Cancel</button>' +
+      '<button type="button" class="btn danger" id="edRemove">Remove from bill</button>' +
+    '</div>';
+  $('editorHost').appendChild(form);
+  editor.form = form;
+
+  var nameInput = form.querySelector('#edName');
+  if (order) nameInput.value = order.name;
+  else if (!forOther) {
+    var saved = store.get('stb.name') || '';
+    var taken = state && state.orders.some(function (o) { return normName(o.name) === normName(saved); });
+    if (saved && !taken) nameInput.value = saved;
+  }
+  nameInput.addEventListener('input', function () { setFieldError('edName', 'edNameErr', ''); });
+  nameInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); if (editor.rows[0]) editor.rows[0].name.focus(); }
+  });
+
+  var items = opts.items || (order ? order.items.map(toRowItem) : []);
+  if (!items.length) addRow(); else items.forEach(function (it) { addRow(it); });
+
+  form.querySelector('#edAddItem').addEventListener('click', function () {
+    var row = addRow();
+    row.name.focus();
+  });
+  form.querySelector('#edCancel').addEventListener('click', function () { closeEditor(); });
+  form.querySelector('#edRemove').addEventListener('click', confirmRemove);
+  form.addEventListener('submit', function (e) { e.preventDefault(); submit(); });
+  form.addEventListener('input', saveDraft);
+
+  updateChrome();
+  updateTotal();
+  renderMine();
+
+  if (opts.focus !== false) {
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!nameInput.value) nameInput.focus({ preventScroll: true });
+    else if (editor.rows[0]) editor.rows[0].name.focus({ preventScroll: true });
+  }
+  return editor;
+}
+
+function toRowItem(i) {
+  return { id: i.id, name: i.name, price: i.expr || plain(i.price) };
+}
+
+function updateChrome() {
+  if (!editor) return;
+  var f = editor.form;
+  var editing = editor.mode === 'edit';
+  var hasMine = myOrders().length > 0;
+  f.querySelector('#edTitle').textContent = editing ? 'Edit your order' : (editor.forOther ? 'Add someone else' : 'Add your order');
+  f.querySelector('#edLead').textContent = editing
+    ? 'Change anything, then tap Save. The host sees it right away.'
+    : (editor.forOther
+      ? "For a friend without a phone. You'll be able to edit it from here."
+      : "It goes straight to the host's phone. You can change it later.");
+  f.querySelector('#edNameLabel').textContent = editor.forOther ? 'Their name' : 'Your name';
+  f.querySelector('#edTotalLabel').textContent = editor.forOther ? 'Their total' : 'Your total';
+  f.querySelector('#edSubmitText').textContent = editing ? 'Save changes' : (editor.forOther ? 'Add to the bill' : 'Add me to the bill');
+  f.querySelector('#edCancel').hidden = !(editing || hasMine);
+  f.querySelector('#edRemove').hidden = !editing;
+  f.querySelector('#edAddItem').hidden = editor.rows.length >= 30;
+}
+
+function addRow(item) {
+  item = item || { name: '', price: '' };
+  var key = 'r' + (++rowSeq);
+  var el = document.createElement('div');
+  el.className = 'row';
+  el.innerHTML =
+    '<input class="input i-name" list="knownItems" maxlength="60" autocomplete="off" autocapitalize="sentences" enterkeyhint="next" placeholder="e.g. Biryani">' +
+    '<div class="price"><input class="input i-price num" inputmode="decimal" autocomplete="off" enterkeyhint="next" maxlength="60" placeholder="Price"><span class="unit">tk</span></div>' +
+    '<button type="button" class="icon-btn i-remove">' + ICON.close + '</button>' +
+    '<div class="calc full" hidden>' +
+      '<div class="ops">' +
+        '<button type="button" tabindex="-1" data-op="+" aria-label="plus">+</button>' +
+        '<button type="button" tabindex="-1" data-op="−" aria-label="minus">−</button>' +
+        '<button type="button" tabindex="-1" data-op="×" aria-label="times">×</button>' +
+        '<button type="button" tabindex="-1" data-op="÷" aria-label="divided by">÷</button>' +
+      '</div>' +
+      '<span class="hint">Calculator</span>' +
+      '<output class="out num"></output>' +
+    '</div>' +
+    '<div class="note full" hidden></div>' +
+    '<div class="err full"></div>';
+  var row = {
+    key: key,
+    id: item.id || null,
+    el: el,
+    name: el.querySelector('.i-name'),
+    price: el.querySelector('.i-price'),
+    calc: el.querySelector('.calc'),
+    hintEl: el.querySelector('.calc .hint'),
+    ops: el.querySelector('.calc .ops'),
+    out: el.querySelector('.calc .out'),
+    note: el.querySelector('.note'),
+    err: el.querySelector('.err')
+  };
+  row.name.value = item.name || '';
+  row.price.value = item.price || '';
+  editor.rows.push(row);
+  editor.form.querySelector('#edItems').appendChild(el);
+  relabelRows();
+
+  row.name.addEventListener('input', function () { clearRowError(row); });
+  row.name.addEventListener('change', function () { suggestPrice(row); });
+  row.name.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); suggestPrice(row); row.price.focus(); }
+  });
+  function saveCaret() {
+    if (document.activeElement !== row.price) return;
+    row.sel = [row.price.selectionStart, row.price.selectionEnd];
+  }
+  ['keyup', 'click', 'select'].forEach(function (t) { row.price.addEventListener(t, saveCaret); });
+  row.price.addEventListener('input', function () {
+    row.autofilled = false;
+    saveCaret();
+    clearRowError(row);
+    row.note.hidden = true;
+    refreshCalc(row, true);
+    updateTotal();
+  });
+  row.price.addEventListener('focus', function () {
+    refreshCalc(row, true);
+    if (row.autofilled) selectAllSoon(row.price); // typing replaces the suggested price
+  });
+  row.price.addEventListener('blur', function () {
+    // Wait a moment: tapping an operator key can blur the box briefly before it is focused again.
+    setTimeout(function () {
+      if (!editor || editor.rows.indexOf(row) < 0 || document.activeElement === row.price) return;
+      refreshCalc(row, false);
+      var r = evaluate(row.price.value);
+      if (!r.ok) showRowError(row, "Can't work that price out. Use numbers with + − × ÷, like 120+80.", row.price);
+    }, 250);
+  });
+  row.price.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    var idx = editor.rows.indexOf(row);
+    var next = editor.rows[idx + 1];
+    if (next) next.name.focus(); else row.price.blur();
+  });
+  // Operator keys: keep the keyboard open (no focus change) and type at the cursor.
+  row.ops.addEventListener('pointerdown', function (e) { if (e.target.closest('button')) e.preventDefault(); });
+  row.ops.addEventListener('mousedown', function (e) { if (e.target.closest('button')) e.preventDefault(); });
+  row.ops.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-op]');
+    if (!b) return;
+    insertAtCaret(row.price, b.getAttribute('data-op'), row.sel);
+  });
+  el.querySelector('.i-remove').addEventListener('click', function () { removeRow(row); });
+  updateChrome();
+  return row;
+}
+
+function relabelRows() {
+  editor.rows.forEach(function (r, i) {
+    var n = i + 1;
+    r.name.setAttribute('aria-label', 'Item ' + n + ' name');
+    r.price.setAttribute('aria-label', 'Item ' + n + ' price in taka');
+    r.el.querySelector('.i-remove').setAttribute('aria-label', 'Remove item ' + n);
+  });
+}
+
+function removeRow(row) {
+  if (editor.rows.length === 1) {
+    row.name.value = '';
+    row.price.value = '';
+    row.id = null;
+    clearRowError(row);
+    row.note.hidden = true;
+    refreshCalc(row, false);
+    updateTotal();
+    row.name.focus();
+    return;
+  }
+  var idx = editor.rows.indexOf(row);
+  editor.rows.splice(idx, 1);
+  row.el.remove();
+  relabelRows();
+  updateChrome();
+  updateTotal();
+  saveDraft();
+  var next = editor.rows[Math.min(idx, editor.rows.length - 1)];
+  if (next) next.name.focus();
+}
+
+function insertAtCaret(input, text, saved) {
+  var len = input.value.length;
+  var start, end;
+  if (document.activeElement === input && input.selectionStart != null) {
+    start = input.selectionStart;
+    end = input.selectionEnd;
+  } else if (saved && saved[0] != null && saved[0] <= len) {
+    start = saved[0];
+    end = Math.min(saved[1] != null ? saved[1] : start, len);
+  } else {
+    start = end = len;
+  }
+  input.value = input.value.slice(0, start) + text + input.value.slice(end);
+  var pos = start + text.length;
+  input.focus();
+  try { input.setSelectionRange(pos, pos); } catch (e) { /* ignore */ }
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function refreshCalc(row, focused) {
+  var text = row.price.value;
+  var r = evaluate(text);
+  var showResult = hasOperators(text) && r.ok && !r.empty;
+  row.ops.hidden = !focused;
+  row.hintEl.hidden = !focused || showResult;
+  row.out.textContent = showResult ? '= ' + tk(r.value) : '';
+  row.calc.hidden = !(focused || showResult);
+}
+
+function suggestPrice(row) {
+  if (row.price.value.trim()) return;
+  var n = baseItemName(row.name.value);
+  var p = knownPrices[n];
+  if (p == null || n === '') return;
+  row.price.value = plain(p);
+  row.autofilled = true;
+  row.note.textContent = 'Price filled in from the bill. Type to change it if yours was different.';
+  row.note.hidden = false;
+  if (document.activeElement === row.price) selectAllSoon(row.price);
+  updateTotal();
+}
+
+function selectAllSoon(input) {
+  setTimeout(function () {
+    if (document.activeElement !== input) return;
+    try { input.setSelectionRange(0, input.value.length); } catch (e) { /* ignore */ }
+  }, 0);
+}
+
+function updateTotal() {
+  if (!editor) return;
+  var sum = 0, bad = false;
+  editor.rows.forEach(function (r) {
+    var v = evaluate(r.price.value);
+    if (v.ok) sum += v.value; else bad = true;
+  });
+  editor.form.querySelector('#edTotal').textContent = tk(sum) + (bad ? ' + ?' : '');
+}
+
+function setFieldError(inputId, errId, msg) {
+  var input = editor.form.querySelector('#' + inputId);
+  editor.form.querySelector('#' + errId).textContent = msg;
+  if (msg) input.setAttribute('aria-invalid', 'true'); else input.removeAttribute('aria-invalid');
+}
+function showRowError(row, msg, input) {
+  row.err.textContent = msg;
+  (input || row.price).setAttribute('aria-invalid', 'true');
+}
+function clearRowError(row) {
+  row.err.textContent = '';
+  row.name.removeAttribute('aria-invalid');
+  row.price.removeAttribute('aria-invalid');
+  editor.form.querySelector('#edItemsErr').textContent = '';
+}
+function formError(msg) { if (editor) editor.form.querySelector('#edFormErr').textContent = msg || ''; }
+
+function showNotice(text, action) {
+  var n = editor.form.querySelector('#edNotice');
+  n.innerHTML = '';
+  var span = document.createElement('span');
+  span.textContent = text;
+  n.appendChild(span);
+  if (action) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = action.label;
+    b.addEventListener('click', action.onClick);
+    n.appendChild(b);
+  }
+  n.hidden = false;
+}
+function hideNotice() { if (editor) editor.form.querySelector('#edNotice').hidden = true; }
+
+/** Keeps the form honest when the host changes or removes the order being edited. */
+function checkEditorConflict() {
+  if (!editor) return;
+  updateChrome();
+  if (editor.mode !== 'edit' || editor.busy) return;
+  var o = findOrder(editor.orderId);
+  if (!o || !o.mine) {
+    editor.mode = 'new';
+    editor.orderId = null;
+    editor.baseSig = null;
+    editor.rows.forEach(function (r) { r.id = null; });
+    updateChrome();
+    showNotice('The host took this order off the bill. Tap the button below to add it back.');
+    return;
+  }
+  if (sig(o) !== editor.baseSig) {
+    showNotice('The host just changed this order.', {
+      label: 'Show their version',
+      onClick: function () {
+        loadIntoEditor(o.name, o.items.map(toRowItem));
+        editor.baseSig = sig(o);
+        hideNotice();
+      }
+    });
+  }
+}
+
+function loadIntoEditor(name, items) {
+  if (name != null) editor.form.querySelector('#edName').value = name;
+  editor.rows.slice().forEach(function (r) { r.el.remove(); });
+  editor.rows = [];
+  if (!items.length) addRow(); else items.forEach(function (it) { addRow(it); });
+  updateTotal();
+  saveDraft();
+}
+
+function filledRows() {
+  return editor.rows.filter(function (r) { return r.name.value.trim() || r.price.value.trim(); });
+}
+
+function validate() {
+  var ok = true, firstBad = null;
+  var nameInput = editor.form.querySelector('#edName');
+  var name = nameInput.value.trim().replace(/\s+/g, ' ');
+  formError('');
+  if (!name) {
+    setFieldError('edName', 'edNameErr', editor.forOther ? 'Please enter their name.' : 'Please enter your name.');
+    ok = false; firstBad = firstBad || nameInput;
+  } else {
+    var clash = state && state.orders.find(function (o) {
+      if (o.id === editor.orderId || normName(o.name) !== normName(name)) return false;
+      if (o.mine) return false; // the server updates your own order with that name
+      var placeholder = !o.guest && !o.items.length && Order0(o.total) && Order0(o.paid);
+      return !placeholder;
+    });
+    if (clash) {
+      setFieldError('edName', 'edNameErr', 'There’s already a “' + clash.name + '” on the bill. Add your surname or an initial.');
+      ok = false; firstBad = firstBad || nameInput;
+    } else setFieldError('edName', 'edNameErr', '');
+  }
+
+  var items = [];
+  editor.rows.forEach(function (r) {
+    var n = r.name.value.trim().replace(/\s+/g, ' ');
+    var p = r.price.value.trim();
+    if (!n && !p) return;
+    var v = evaluate(p);
+    if (!v.ok) {
+      showRowError(r, "Can't work that price out. Use numbers with + − × ÷, like 120+80.", r.price);
+      ok = false; firstBad = firstBad || r.price; return;
+    }
+    if (v.value < 0) {
+      showRowError(r, "The price can't be below zero.", r.price);
+      ok = false; firstBad = firstBad || r.price; return;
+    }
+    if (!n) {
+      showRowError(r, 'What is this item called?', r.name);
+      ok = false; firstBad = firstBad || r.name; return;
+    }
+    items.push({ row: r, name: n, price: p });
+  });
+  if (ok && !items.length) {
+    editor.form.querySelector('#edItemsErr').textContent = 'Add at least one thing you ordered.';
+    ok = false; firstBad = firstBad || editor.rows[0].name;
+  }
+  if (!ok) {
+    if (firstBad) { firstBad.focus({ preventScroll: true }); firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    return null;
+  }
+  return { name: name, items: items };
+}
+
+async function submit() {
+  if (!editor || editor.busy) return;
+  var v = validate();
+  if (!v) return;
+  var ed = editor;
+  ed.busy = true;
+  var btn = ed.form.querySelector('#edSubmit');
+  var label = ed.form.querySelector('#edSubmitText');
+  var oldLabel = label.textContent;
+  btn.disabled = true;
+  label.textContent = 'Saving…';
+  var editing = ed.mode === 'edit';
+  try {
+    var body = {
+      token: TOKEN,
+      name: v.name,
+      items: v.items.map(function (it) {
+        var out = { name: it.name, price: normalizeExpr(it.price) };
+        if (it.row.id) out.id = it.row.id;
+        return out;
+      })
+    };
+    var res = await fetch(editing ? '/api/orders/' + encodeURIComponent(ed.orderId) : '/api/orders', {
+      method: editing ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    var data = null;
+    try { data = await res.json(); } catch (e) { /* not JSON */ }
+    if (editor !== ed) return;
+    if (!res.ok || !data || !data.ok) { handleSaveError(res.status, data, v.items); return; }
+    if (!ed.forOther) store.set('stb.name', v.name);
+    $('welcome').hidden = true;
+    store.set('stb.welcomed', '1');
+    knownMine[data.id] = v.name;
+    applyState(data.state);
+    closeEditor();
+    toast(editing ? 'Saved ✓ The host can see your changes.' : (ed.forOther ? 'Added ' + v.name + ' to the bill ✓' : "You're on the bill! 🎉 The host can see it now."));
+    var card = document.querySelector('[data-order="' + (window.CSS && CSS.escape ? CSS.escape(data.id) : data.id) + '"]');
+    if (card) { card.scrollIntoView({ behavior: 'smooth', block: 'center' }); card.classList.add('flash'); }
+  } catch (e) {
+    if (editor === ed) formError("Couldn't reach the host's phone. Check you're on the same Wi‑Fi or hotspot, then try again.");
+  } finally {
+    if (editor === ed) {
+      ed.busy = false;
+      btn.disabled = false;
+      label.textContent = oldLabel;
+      updateChrome();
+    }
+  }
+}
+
+function handleSaveError(status, data, sentItems) {
+  var msg = (data && data.error) || ('Something went wrong (' + status + '). Please try again.');
+  var field = data && data.field;
+  if (field === 'name') {
+    setFieldError('edName', 'edNameErr', msg);
+    editor.form.querySelector('#edName').focus();
+    return;
+  }
+  if (field === 'gone') {
+    editor.mode = 'new';
+    editor.orderId = null;
+    editor.rows.forEach(function (r) { r.id = null; });
+    updateChrome();
+    showNotice(msg);
+    return;
+  }
+  var m = field && /^items\.(\d+)\.(name|price)$/.exec(field);
+  if (m && sentItems[+m[1]]) {
+    var row = sentItems[+m[1]].row;
+    showRowError(row, msg, m[2] === 'name' ? row.name : row.price);
+    (m[2] === 'name' ? row.name : row.price).focus();
+    return;
+  }
+  if (field === 'items') { editor.form.querySelector('#edItemsErr').textContent = msg; return; }
+  formError(msg);
+}
+
+function closeEditor(silent) {
+  if (!editor) return;
+  clearDraft();
+  editor.form.remove();
+  editor = null;
+  if (!silent) renderMine();
+}
+
+function confirmRemove() {
+  if (!editor || editor.mode !== 'edit') return;
+  var o = findOrder(editor.orderId);
+  var name = o ? o.name : 'this order';
+  sheet({
+    title: 'Take ' + name + ' off the bill?',
+    text: 'Their items will be removed from the host’s bill too.',
+    actions: [{ label: 'Yes, remove', kind: 'primary', onClick: function () { removeOrder(editor.orderId, name); } }],
+    cancelLabel: 'Keep it'
+  });
+}
+
+async function removeOrder(id, name) {
+  if (!editor) return;
+  var ed = editor;
+  ed.deleting = id;
+  try {
+    var res = await fetch('/api/orders/' + encodeURIComponent(id) + '?token=' + TOKEN, { method: 'DELETE' });
+    var data = null;
+    try { data = await res.json(); } catch (e) { /* ignore */ }
+    if (!res.ok || !data || !data.ok) {
+      if (editor === ed) formError((data && data.error) || 'Couldn’t remove it. Please try again.');
+      return;
+    }
+    delete knownMine[id];
+    if (editor === ed) closeEditor(true);
+    applyState(data.state);
+    renderMine();
+    toast('Removed ' + name + ' from the bill.');
+  } catch (e) {
+    if (editor === ed) formError("Couldn't reach the host's phone. Please try again.");
+  } finally {
+    ed.deleting = null;
+  }
+}
+
+/* ======================================================================
+   Draft: what's typed survives a reload or the browser closing the tab.
+   ====================================================================== */
+var DRAFT_KEY = 'stb.draft';
+var DRAFT_MAX_AGE = 6 * 60 * 60 * 1000;
+
+function saveDraft() {
+  if (!editor) return;
+  var name = editor.form.querySelector('#edName').value;
+  var items = filledRows().map(function (r) { return { id: r.id, name: r.name.value, price: r.price.value }; });
+  if (editor.mode === 'new' && !name.trim() && !items.length) { clearDraft(); return; }
+  store.set(DRAFT_KEY, JSON.stringify({
+    mode: editor.mode, orderId: editor.orderId, forOther: editor.forOther,
+    baseSig: editor.baseSig, name: name, items: items, t: Date.now()
+  }));
+}
+
+function clearDraft() {
+  try { window.localStorage.removeItem(DRAFT_KEY); } catch (e) { /* ignore */ }
+}
+
+function restoreDraft() {
+  var d = null;
+  try { d = JSON.parse(store.get(DRAFT_KEY) || 'null'); } catch (e) { d = null; }
+  if (!d || typeof d !== 'object' || !Array.isArray(d.items) || !(Date.now() - d.t < DRAFT_MAX_AGE)) { clearDraft(); return; }
+  var order = d.mode === 'edit' ? findOrder(d.orderId) : null;
+  if (order && order.mine) {
+    openEditor({ mode: 'edit', order: order, items: d.items, focus: false });
+    editor.baseSig = d.baseSig || editor.baseSig;
+  } else {
+    openEditor({ mode: 'new', forOther: !!d.forOther, items: d.items, focus: false });
+  }
+  editor.form.querySelector('#edName').value = String(d.name || '');
+  saveDraft();
+  showNotice('We kept what you were typing. Check it, then save.');
+}
+
+/* ======================================================================
+   Copy someone's order
+   ====================================================================== */
+function copyOrder(id) {
+  var src = findOrder(id);
+  if (!src || !src.items.length) return;
+  var items = src.items.map(function (i) { return { name: i.name, price: i.expr || plain(i.price) }; });
+  var who = src.name;
+
+  function into() {
+    var existing = filledRows();
+    if (!existing.length) {
+      loadIntoEditor(null, items);
+      done();
+      return;
+    }
+    sheet({
+      title: 'Copy ' + who + '’s order',
+      text: 'You already have items in your order. What should happen to them?',
+      actions: [
+        { label: 'Add ' + who + '’s items to mine', kind: 'primary', onClick: function () {
+          var keep = filledRows().map(function (r) { return { id: r.id, name: r.name.value, price: r.price.value }; });
+          loadIntoEditor(null, keep.concat(items));
+          done();
+        } },
+        { label: 'Replace mine with ' + who + '’s', kind: 'tonal', onClick: function () {
+          loadIntoEditor(null, items);
+          done();
+        } }
+      ]
+    });
+  }
+  function done() {
+    hideNotice();
+    editor.form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    editor.form.classList.remove('flash');
+    void editor.form.offsetWidth;
+    editor.form.classList.add('flash');
+    var nameInput = editor.form.querySelector('#edName');
+    if (!nameInput.value.trim()) nameInput.focus({ preventScroll: true });
+    var submitText = editor.form.querySelector('#edSubmitText').textContent;
+    toast('Copied ' + who + '’s order. Change anything, then tap “' + submitText + '”.');
+  }
+
+  if (editor) { into(); return; }
+  var mine = myOrders();
+  if (mine.length === 0) { openEditor({ mode: 'new', focus: false }); into(); return; }
+  if (mine.length === 1) { openEditor({ mode: 'edit', order: mine[0], focus: false }); into(); return; }
+  sheet({
+    title: 'Copy ' + who + '’s order into…',
+    actions: mine.map(function (o) {
+      return { label: o.name, kind: 'tonal', onClick: function () { openEditor({ mode: 'edit', order: o, focus: false }); into(); } };
+    }).concat([{ label: 'Someone new', kind: 'tonal', onClick: function () { openEditor({ mode: 'new', forOther: true, focus: false }); into(); } }])
+  });
+}
+
+/* ======================================================================
+   Start
+   ====================================================================== */
+pollLoop();
+</script>
+</body>
+</html>

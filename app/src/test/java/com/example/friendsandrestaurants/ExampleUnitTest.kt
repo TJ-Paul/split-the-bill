@@ -184,7 +184,7 @@ class ExampleUnitTest {
 
     @Test
     fun dedupeNames_skipsExistingAndRepeats() {
-        val (toAdd, skipped) = OrderViewModel.dedupeNames(
+        val (toAdd, skipped) = BillRepository.dedupeNames(
             listOf("arib", "  ", "Bob", "bob", "carl", "ARIB"),
             existing = listOf("Carl")
         )
@@ -194,8 +194,8 @@ class ExampleUnitTest {
 
     @Test
     fun suggestionName_stripsSharedSuffix() {
-        assertEquals("pizza", OrderViewModel.suggestionName("pizza (shared ÷3)"))
-        assertEquals("pizza", OrderViewModel.suggestionName("Pizza"))
+        assertEquals("pizza", BillRepository.suggestionName("pizza (shared ÷3)"))
+        assertEquals("pizza", BillRepository.suggestionName("Pizza"))
     }
 
     @Test

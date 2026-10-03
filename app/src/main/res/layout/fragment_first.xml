@@ -88,6 +88,60 @@
                 app:iconSize="20dp" />
         </LinearLayout>
 
+        <!-- Shown while friends can add orders from the shared web page -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/liveBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/share_banner_desc"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/status_refund_container"
+            app:cardCornerRadius="14dp"
+            app:strokeWidth="0dp"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingEnd="4dp">
+
+                <View
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:background="@drawable/bg_live_dot" />
+
+                <TextView
+                    android:id="@+id/tvLiveBanner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:accessibilityLiveRegion="polite"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textColor="@color/status_refund"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    tools:text="Sharing live · 2 people viewing" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLiveShowQr"
+                    style="@style/Widget.App.Button.Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/share_show_qr"
+                    android:textColor="@color/status_refund"
+                    app:icon="@drawable/ic_qr_code"
+                    app:iconSize="18dp"
+                    app:iconTint="@color/status_refund" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"

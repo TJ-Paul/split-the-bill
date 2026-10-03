@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_share_live"
+        android:icon="@drawable/ic_qr_code"
+        android:title="@string/action_share_live"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_history"
         android:icon="@drawable/ic_history"
         android:title="@string/action_history"

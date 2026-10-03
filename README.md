@@ -23,6 +23,7 @@ You can download the latest stable version of the app directly or build it yours
 
 ## ✨ Features
 
+*   **📲 Share with Friends (QR code)**: Tap the QR icon and everyone at the table can add their own order from their phone — no app needed. They join your Wi‑Fi or your hotspot, scan the code, and get a simple page where they type their name, items and prices (sums like `120+80` or `900÷3` work there too). Everyone sees the whole bill as a receipt and can **copy** someone's order to start from. Guests can only change the orders they added themselves; you see every change live and can still edit anything.
 *   **👥 Effortless Friend Management**: Add friends one at a time (with "Add & next" for fast entry), pick from **Recent** friends (with search, select-all, and anyone already on the bill marked "In list"), or **Bulk** add a list of names. Duplicates are skipped automatically.
 *   **🍕 Order Details**: Track each friend's items, prices, and how much they've paid. Add as many items per person as you need.
 *   **🧮 Built-in Calculator**: Type `120+80`, `40*2` or `900/3` straight into any price field — it opens a number pad, shows the result, and remembers your expression when you tap back in.
@@ -48,6 +49,16 @@ You can download the latest stable version of the app directly or build it yours
 
 <br>
 
+### Letting friends add their own orders
+
+1.  Turn on your **hotspot** (or make sure everyone is on the **same Wi‑Fi**).
+2.  Tap the **QR icon** at the top and let friends scan the code with their camera.
+3.  Their orders appear on your phone instantly, marked with a small phone icon. Tap **Stop sharing** (in the app or the notification) when you're done.
+
+If the page won't open on a friend's phone, ask them to turn off mobile data, or use your hotspot — some restaurant Wi‑Fi blocks phones from seeing each other.
+
+<br>
+
 ## 🛠 Tech Stack
 
 *   **Language**: Kotlin
@@ -55,6 +66,7 @@ You can download the latest stable version of the app directly or build it yours
 *   **UI Components**: Material Design 3, RecyclerView, ViewBinding
 *   **Navigation**: Jetpack Navigation Component
 *   **Storage**: SharedPreferences with JSON serialization
+*   **Sharing**: A small built-in web server (foreground service) on the local network, a single offline web page, and ZXing for the QR code
 
 <br>
 

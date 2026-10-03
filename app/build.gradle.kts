@@ -42,8 +42,11 @@ dependencies {
     
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.zxing.core)
 
     testImplementation(libs.junit)
+    // Real org.json for unit tests (Android's copy is only a stub on the JVM).
+    testImplementation(libs.org.json)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
 }

@@ -1,7 +1,10 @@
 package com.example.friendsandrestaurants
 
+import android.Manifest
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -16,6 +19,7 @@ import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
@@ -41,6 +45,7 @@ import com.example.friendsandrestaurants.databinding.DialogListBinding
 import com.example.friendsandrestaurants.databinding.DialogQuickAddFoodBinding
 import com.example.friendsandrestaurants.databinding.FragmentFirstBinding
 import com.example.friendsandrestaurants.databinding.ItemExtraFoodBinding
+import com.example.friendsandrestaurants.share.ShareSession
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -56,6 +61,11 @@ class FirstFragment : Fragment() {
     private lateinit var adapter: OrderAdapter
     private var imeVisible = false
     private var pendingScrollToId: String? = null
+
+    /** Sharing works without it, but the "sharing" notification (with its Stop button) needs it. */
+    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        startSharing()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,6 +87,8 @@ class FirstFragment : Fragment() {
         binding.btnBulkAdd.setOnClickListener { showBulkAddDialog() }
         binding.fabAddFood.setOnClickListener { showQuickAddFoodDialog() }
         binding.btnReceipt.setOnClickListener { openReceipt() }
+        binding.liveBanner.setOnClickListener { showShareDialog() }
+        binding.btnLiveShowQr.setOnClickListener { showShareDialog() }
 
         // Hide the summary bar and FAB while typing so more of the list fits above the keyboard.
         ViewCompat.setOnApplyWindowInsetsListener(binding.coordinator) { _, insets ->
@@ -90,6 +102,7 @@ class FirstFragment : Fragment() {
         }
 
         viewModel.summary.observe(viewLifecycleOwner) { renderSummary(it) }
+        ShareSession.state.observe(viewLifecycleOwner) { renderLiveBanner(it) }
     }
 
     private fun setupMenu() {
@@ -99,6 +112,7 @@ class FirstFragment : Fragment() {
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean = when (menuItem.itemId) {
+                R.id.action_share_live -> { onShareClicked(); true }
                 R.id.action_history -> { showSavedLogsDialog(); true }
                 R.id.action_clear -> { showWipeConfirmationDialog(); true }
                 else -> false
@@ -199,6 +213,47 @@ class FirstFragment : Fragment() {
         val nav = findNavController()
         if (nav.currentDestination?.id == R.id.FirstFragment) {
             nav.navigate(R.id.action_FirstFragment_to_SecondFragment)
+        }
+    }
+
+    // ------------------------------------------------------------------ share with friends
+
+    private fun onShareClicked() {
+        if (ShareSession.current.isActive) {
+            showShareDialog()
+            return
+        }
+        val needsPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        if (needsPermission) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            startSharing()
+        }
+    }
+
+    private fun startSharing() {
+        if (_binding == null) return
+        // Commit the field being edited so guests see it.
+        binding.root.clearFocusAndHideKeyboard()
+        ShareSession.start(requireContext())
+        showShareDialog()
+    }
+
+    private fun showShareDialog() {
+        if (_binding == null) return
+        ShareSessionDialog(this) {
+            _binding?.let { snackbar(getString(R.string.share_stopped)).show() }
+        }.show()
+    }
+
+    private fun renderLiveBanner(state: ShareSession.State) {
+        val b = _binding ?: return
+        b.liveBanner.isVisible = state.isActive
+        b.tvLiveBanner.text = when {
+            state.status == ShareSession.Status.STARTING -> getString(R.string.share_banner_starting)
+            state.viewers > 0 -> resources.getQuantityString(R.plurals.share_banner_viewers, state.viewers, state.viewers)
+            else -> getString(R.string.share_banner_live)
         }
     }
 
@@ -686,7 +741,7 @@ class FirstFragment : Fragment() {
         dialog.show()
     }
 
-    private fun showAddResult(result: OrderViewModel.AddResult) {
+    private fun showAddResult(result: BillRepository.AddResult) {
         if (result.added == 0 && result.skipped == 0) return
         val parts = mutableListOf<String>()
         if (result.added > 0) parts.add(resources.getQuantityString(R.plurals.added_friends, result.added, result.added))

@@ -144,6 +144,13 @@ class OrderAdapter(
             try {
                 order = o
                 binding.tvFriendName.text = o.friendName
+                // Orders a guest added from the shared page get a small phone icon.
+                val fromGuest = o.ownerToken != null
+                binding.tvFriendName.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    0, 0, if (fromGuest) R.drawable.ic_guest_badge else 0, 0
+                )
+                binding.tvFriendName.contentDescription =
+                    if (fromGuest) ctx.getString(R.string.guest_order_desc, o.friendName) else null
                 binding.tvAvatar.text = initials(o.friendName)
                 binding.tvAvatar.backgroundTintList = ColorStateList.valueOf(avatarColor(o.friendName))
                 renderItems(o)

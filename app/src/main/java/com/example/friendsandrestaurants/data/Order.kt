@@ -21,7 +21,9 @@ data class Order(
     var isDone: Boolean = false,
     var rawPriceExpression: String? = null,
     var rawPaidExpression: String? = null,
-    val items: MutableList<FoodItem> = mutableListOf()
+    val items: MutableList<FoodItem> = mutableListOf(),
+    /** Set when a guest added this order from the shared web page; only that browser may edit it. */
+    var ownerToken: String? = null
 ) {
     /** Positive = refund owed to this friend, negative = they still owe. Rounded to cents. */
     val cashback: Double
