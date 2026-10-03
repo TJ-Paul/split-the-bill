@@ -1,53 +1,164 @@
 <resources>
-    <string name="app_name">FriendsAndRestaurants</string>
-    <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-    <string name="add_food">Food</string>
-    <string name="quick_add_food_title">Quick Add Food</string>
-    <string name="food_name_hint">Food Name</string>
-    <string name="price_hint">Price</string>
-    <string name="select_friends">Select Friends</string>
+    <string name="app_name">Split the Bill</string>
+    <string name="receipt_title">Receipt</string>
+    <string name="currency">tk</string>
+    <string name="money_tk">%1$s tk</string>
+
+    <!-- Common -->
     <string name="cancel">Cancel</string>
     <string name="add">Add</string>
+    <string name="ok">OK</string>
+    <string name="close">Close</string>
+    <string name="delete">Delete</string>
+    <string name="remove">Remove</string>
+    <string name="undo">Undo</string>
+    <string name="share">Share</string>
+    <string name="copy">Copy</string>
+    <string name="back">Back</string>
+    <string name="invalid_calculation">Invalid calculation</string>
 
-    <string name="lorem_ipsum">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
-        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
-        dui nec risus. Maecenas non sodales nisi, vel dictum dolor. Class aptent taciti sociosqu ad
-        litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse blandit eleifend
-        diam, vel rutrum tellus vulputate quis. Aliquam eget libero aliquet, imperdiet nisl a,
-        ornare ex. Sed rhoncus est ut libero porta lobortis. Fusce in dictum tellus.\n\n
-        Suspendisse interdum ornare ante. Aliquam nec cursus lorem. Morbi id magna felis. Vivamus
-        egestas, est a condimentum egestas, turpis nisl iaculis ipsum, in dictum tellus dolor sed
-        neque. Morbi tellus erat, dapibus ut sem a, iaculis tincidunt dui. Interdum et malesuada
-        fames ac ante ipsum primis in faucibus. Curabitur et eros porttitor, ultricies urna vitae,
-        molestie nibh. Phasellus at commodo eros, non aliquet metus. Sed maximus nisl nec dolor
-        bibendum, vel congue leo egestas.\n\n
-        Sed interdum tortor nibh, in sagittis risus mollis quis. Curabitur mi odio, condimentum sit
-        amet auctor at, mollis non turpis. Nullam pretium libero vestibulum, finibus orci vel,
-        molestie quam. Fusce blandit tincidunt nulla, quis sollicitudin libero facilisis et. Integer
-        interdum nunc ligula, et fermentum metus hendrerit id. Vestibulum lectus felis, dictum at
-        lacinia sit amet, tristique id quam. Cras eu consequat dui. Suspendisse sodales nunc ligula,
-        in lobortis sem porta sed. Integer id ultrices magna, in luctus elit. Sed a pellentesque
-        est.\n\n
-        Aenean nunc velit, lacinia sed dolor sed, ultrices viverra nulla. Etiam a venenatis nibh.
-        Morbi laoreet, tortor sed facilisis varius, nibh orci rhoncus nulla, id elementum leo dui
-        non lorem. Nam mollis ipsum quis auctor varius. Quisque elementum eu libero sed commodo. In
-        eros nisl, imperdiet vel imperdiet et, scelerisque a mauris. Pellentesque varius ex nunc,
-        quis imperdiet eros placerat ac. Duis finibus orci et est auctor tincidunt. Sed non viverra
-        ipsum. Nunc quis augue egestas, cursus lorem at, molestie sem. Morbi a consectetur ipsum, a
-        placerat diam. Etiam vulputate dignissim convallis. Integer faucibus mauris sit amet finibus
-        convallis.\n\n
-        Phasellus in aliquet mi. Pellentesque habitant morbi tristique senectus et netus et
-        malesuada fames ac turpis egestas. In volutpat arcu ut felis sagittis, in finibus massa
-        gravida. Pellentesque id tellus orci. Integer dictum, lorem sed efficitur ullamcorper,
-        libero justo consectetur ipsum, in mollis nisl ex sed nisl. Donec maximus ullamcorper
-        sodales. Praesent bibendum rhoncus tellus nec feugiat. In a ornare nulla. Donec rhoncus
-        libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
-        vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
-    </string>
+    <!-- Main screen -->
+    <string name="restaurant_hint">Restaurant name</string>
+    <string name="restaurant_icon_desc">Restaurant</string>
+    <string name="action_add_friend">Add</string>
+    <string name="action_add_friend_hint">Add one friend with their order</string>
+    <string name="action_recent">Recent</string>
+    <string name="action_recent_hint">Pick from friends you\'ve added before</string>
+    <string name="action_bulk">Bulk</string>
+    <string name="action_bulk_hint">Type several names at once</string>
+    <string name="add_food">Add item</string>
+    <string name="add_food_hint">Add one item to several friends, or split a shared item</string>
+    <string name="action_history">History</string>
+    <string name="action_clear">Clear all</string>
+    <string name="empty_title">No one at the table yet</string>
+    <string name="empty_body">Add friends with the buttons above, then fill in what each person ordered and paid.</string>
+    <string name="summary_total_label">Total bill</string>
+    <string name="summary_view_receipt">Receipt</string>
+    <string name="summary_all_settled">All settled</string>
+    <string name="summary_nothing_yet">Nothing ordered yet</string>
+    <string name="summary_paid">Paid %1$s</string>
+    <string name="summary_due">Due %1$s</string>
+    <string name="summary_refund">Refund %1$s</string>
+    <plurals name="friend_count">
+        <item quantity="one">%d friend</item>
+        <item quantity="other">%d friends</item>
+    </plurals>
+    <plurals name="item_count">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
+    <!-- Order card -->
+    <string name="status_due">Due %1$s</string>
+    <string name="status_refund">Refund %1$s</string>
+    <string name="status_settled">Settled</string>
+    <string name="status_no_items">No items yet</string>
+    <string name="status_no_price">No price yet</string>
+    <string name="chip_paid">Paid</string>
+    <string name="chip_unpaid">Unpaid</string>
+    <string name="chip_paid_desc">Payment status. Tap to toggle paid in full.</string>
+    <string name="food_hint">Item</string>
+    <string name="food_hint_numbered">Item %1$d</string>
+    <string name="price_hint">Price</string>
+    <string name="paid_hint">Paid</string>
+    <string name="total_label">Total %1$s</string>
+    <string name="add_item_desc">Add another item</string>
+    <string name="remove_item_desc">Remove this item</string>
+    <string name="more_options_desc">More options</string>
+    <string name="menu_edit_name">Edit name</string>
+    <string name="menu_add_item">Add item</string>
+    <string name="menu_mark_paid">Mark as paid in full</string>
+    <string name="menu_mark_unpaid">Mark as unpaid</string>
+    <string name="menu_remove_friend">Remove friend</string>
+    <string name="edit_name_title">Edit name</string>
+    <string name="save">Save</string>
+    <string name="friend_name_hint">Friend name</string>
+    <string name="name_required">Name required</string>
+    <string name="removed_friend">Removed %1$s</string>
+
+    <!-- Add friend dialog -->
+    <string name="add_friend_title">Add friend</string>
+    <string name="add_and_next">Add &amp; next</string>
+    <string name="added_friend">Added %1$s</string>
+    <string name="add_another_item">Add another item</string>
+    <string name="paid_in_full">Paid in full</string>
+    <string name="already_in_list">%1$s is already in the list</string>
+
+    <!-- Recent friends dialog -->
+    <string name="recent_title">Recent friends</string>
+    <string name="recent_empty">No saved friends yet. Friends you add are remembered here for next time.</string>
+    <string name="search_hint">Search</string>
+    <string name="select_all">Select all</string>
+    <string name="add_selected">Add selected</string>
+    <string name="add_selected_count">Add (%1$d)</string>
+    <string name="in_list">In list</string>
+    <string name="remove_from_saved_desc">Remove from saved friends</string>
+    <string name="remove_saved_title">Remove %1$s?</string>
+    <string name="remove_saved_body">They\'ll be removed from your saved friends. This doesn\'t affect the current bill.</string>
+    <string name="no_matches">No matches</string>
+
+    <!-- Bulk dialog -->
+    <string name="bulk_title">Bulk add friends</string>
+    <string name="bulk_body">One name per line. Names are capitalised automatically and anyone already in the list is skipped.</string>
+    <string name="bulk_hint">Names</string>
+    <string name="bulk_required">Enter at least one name</string>
+    <plurals name="bulk_names_count">
+        <item quantity="one">%d name</item>
+        <item quantity="other">%d names</item>
+    </plurals>
+    <plurals name="added_friends">
+        <item quantity="one">Added %d friend</item>
+        <item quantity="other">Added %d friends</item>
+    </plurals>
+    <plurals name="skipped_duplicates">
+        <item quantity="one">%d already in the list</item>
+        <item quantity="other">%d already in the list</item>
+    </plurals>
+
+    <!-- Add item to many dialog -->
+    <string name="quick_add_food_title">Add item to friends</string>
+    <string name="no_friends_title">No friends yet</string>
+    <string name="no_friends_body">Add some friends first, then you can give them items in one go.</string>
+    <string name="food_name_hint">Item name</string>
+    <string name="mode_each">Price each</string>
+    <string name="mode_split">Split total</string>
+    <string name="select_friends">Who had it?</string>
+    <string name="food_required">Item name required</string>
+    <string name="select_at_least_one">Select at least one friend</string>
+    <string name="preview_each">%1$d × %2$s = %3$s</string>
+    <string name="preview_split">%1$s ÷ %2$d = %3$s each</string>
+    <string name="shared_suffix">(shared ÷%1$d)</string>
+
+    <!-- Clear -->
+    <string name="clear_title">Start a new bill?</string>
+    <string name="clear_body">This removes everyone and their items from the current bill. Saved history and your friends list are kept.</string>
+    <string name="clear_also_restaurant">Also clear restaurant name</string>
+    <string name="clear_confirm">Clear all</string>
+    <string name="cleared">Bill cleared</string>
+
+    <!-- History -->
+    <string name="history_title">History</string>
+    <string name="history_empty">No saved receipts yet. Open the receipt and tap “Save” to keep a copy here.</string>
+    <string name="delete_log_title">Delete this receipt?</string>
+    <string name="delete_log_body">This can\'t be undone.</string>
+    <string name="unknown_restaurant">Unknown Restaurant</string>
+
+    <!-- Receipt -->
+    <string name="unspecified_restaurant">Unspecified Restaurant</string>
+    <string name="receipt_empty">No friends or orders added yet.</string>
+    <string name="receipt_view_summary">Summary</string>
+    <string name="receipt_view_table">Table</string>
+    <string name="receipt_meta">%1$s · %2$s</string>
+    <string name="receipt_paid_of">Paid %1$s of %2$s</string>
+    <string name="stat_paid">Paid</string>
+    <string name="stat_due">Due</string>
+    <string name="stat_refund">Refund</string>
+    <string name="overall_due">Overall due %1$s</string>
+    <string name="overall_refund">Overall refund %1$s</string>
+    <string name="save_to_history">Save</string>
+    <string name="saved_to_history">Saved</string>
+    <string name="saved_snackbar">Saved to history</string>
+    <string name="copied">Copied to clipboard</string>
+    <string name="share_chooser">Share receipt</string>
+    <string name="receipt_clipboard_label">Receipt</string>
 </resources>

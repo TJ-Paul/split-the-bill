@@ -5,147 +5,224 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.friendsandrestaurants.data.FoodItem
 import com.example.friendsandrestaurants.data.Order
 import org.json.JSONArray
 import org.json.JSONObject
-import java.util.Locale
-import kotlin.math.abs
+import java.util.Date
+import java.util.UUID
 
+/**
+ * Holds the current bill.
+ *
+ * All mutations happen on the main thread and use `setValue`, so every read straight after a write
+ * sees the new list (`postValue` would make back-to-back adds and saves read stale data).
+ * Orders are copied before being changed here, so the RecyclerView diff can tell what changed.
+ */
 class OrderViewModel(application: Application) : AndroidViewModel(application) {
     private val prefs = application.getSharedPreferences("orders_prefs", Context.MODE_PRIVATE)
-    
+
+    /** Always-current list, including live edits that have not been re-sorted/re-emitted yet. */
+    private var orderList: List<Order> = emptyList()
+
     private val _orders = MutableLiveData<List<Order>>(emptyList())
+    /** Sorted list for display. Emitted on structural changes and when an edit is committed. */
     val orders: LiveData<List<Order>> = _orders
+
+    private val _summary = MutableLiveData(BillSummary.EMPTY)
+    /** Totals, updated on every change including each keystroke. */
+    val summary: LiveData<BillSummary> = _summary
 
     val allUniqueNames = MutableLiveData<List<String>>(emptyList())
     val allUniqueFoodItems = MutableLiveData<List<String>>(emptyList())
 
     var restaurantName: String = ""
+        private set
+
+    val currentOrders: List<Order> get() = orderList
 
     init {
         loadData()
     }
 
-    private fun updateSuggestions() {
-        val currentOrders = _orders.value ?: emptyList()
-        val names = prefs.getStringSet("all_names", emptySet())?.toMutableSet() ?: mutableSetOf()
-        val items = prefs.getStringSet("all_items", emptySet())?.toMutableSet() ?: mutableSetOf()
-        
-        currentOrders.forEach {
-            if (it.friendName.isNotBlank()) names.add(it.friendName)
-            if (it.foodItem.isNotBlank()) items.add(it.foodItem)
-        }
-        
-        allUniqueNames.value = names.sorted()
-        allUniqueFoodItems.value = items.sorted()
-        
-        prefs.edit()
-            .putStringSet("all_names", names)
-            .putStringSet("all_items", items)
-            .apply()
-    }
+    // ---------------------------------------------------------------- list plumbing
 
-    private fun sortOrders(list: List<Order>): List<Order> {
-        return list.sortedWith(compareBy<Order> {
-            when {
-                it.cashback < 0 -> 0 // Less paid
-                it.cashback > 0 -> 1 // Over paid
-                else -> 2            // Settled
-            }
-        }.thenBy { it.friendName.lowercase() })
-    }
-
-    fun addFriend(name: String, food: String = "", price: Double = 0.0, paid: Double = 0.0) {
-        val currentList = _orders.value ?: emptyList()
-        val formattedName = formatName(name)
-        if (formattedName.isNotBlank()) {
-            val newOrder = Order(
-                friendName = formattedName,
-                foodItem = food.lowercase().trim(),
-                price = price,
-                paid = paid,
-                previousPaid = paid
-            )
-            _orders.value = sortOrders(currentList + newOrder)
-            saveData()
+    private fun commit(list: List<Order>, emit: Boolean = true) {
+        orderList = if (emit) sortOrders(list) else list
+        saveData()
+        _summary.value = BillSummary.of(orderList)
+        if (emit) {
+            _orders.value = orderList
             updateSuggestions()
         }
     }
 
-    fun addFriendsBulk(names: String) {
-        val nameList = names.split("\n")
-            .map { formatName(it) }
-            .filter { it.isNotBlank() }
-        
-        val currentList = _orders.value ?: emptyList()
-        val newOrders = nameList.map { Order(friendName = it) }
-        _orders.value = sortOrders(currentList + newOrders)
-        saveData()
-        updateSuggestions()
+    private fun sortOrders(list: List<Order>): List<Order> = ReceiptFormatter.sortForReceipt(list)
+
+    private fun normalize(order: Order): Order {
+        val copy = order.deepCopy()
+        val formatted = NameFormatter.formatName(copy.friendName)
+        if (formatted.isNotBlank()) copy.friendName = formatted
+        copy.items.forEach { it.name = it.name.lowercase().trim() }
+        copy.syncItems()
+        return copy
     }
 
-    fun addFoodToFriends(names: List<String>, food: String, price: Double) {
-        val currentList = (_orders.value ?: emptyList()).toMutableList()
-        val foodFormatted = food.lowercase().trim()
-        
-        names.forEach { name ->
-            val index = currentList.indexOfFirst { it.friendName == name }
-            if (index != -1) {
-                val existing = currentList[index]
-                val newFood = if (existing.foodItem.isBlank()) foodFormatted else "${existing.foodItem}, $foodFormatted"
-                currentList[index] = existing.copy(
-                    foodItem = newFood,
-                    price = existing.price + price
-                )
-            } else {
-                currentList.add(Order(
-                    friendName = name,
-                    foodItem = foodFormatted,
-                    price = price
-                ))
+    private fun updateSuggestions() {
+        val names = prefs.getStringSet(KEY_NAMES, emptySet())?.toMutableSet() ?: mutableSetOf()
+        val items = prefs.getStringSet(KEY_ITEMS, emptySet())?.toMutableSet() ?: mutableSetOf()
+
+        orderList.forEach { order ->
+            if (order.friendName.isNotBlank()) names.add(order.friendName)
+            order.items.forEach { item ->
+                val name = suggestionName(item.name)
+                if (name.isNotBlank()) items.add(name)
             }
         }
-        _orders.value = sortOrders(currentList)
-        saveData()
-        updateSuggestions()
+        // Older versions stored joined multi-item strings ("nan, chicken") as one suggestion.
+        items.removeAll { it.contains(", ") && it.split(", ").all { part -> part in items } }
+
+        allUniqueNames.value = names.sortedWith(String.CASE_INSENSITIVE_ORDER)
+        allUniqueFoodItems.value = items.sortedWith(String.CASE_INSENSITIVE_ORDER)
+
+        prefs.edit()
+            .putStringSet(KEY_NAMES, names)
+            .putStringSet(KEY_ITEMS, items)
+            .apply()
     }
 
-    fun updateOrder(updatedOrder: Order) {
-        updatedOrder.foodItem = updatedOrder.foodItem.lowercase().trim()
-        val currentList = _orders.value ?: emptyList()
-        val newList = currentList.map {
-            if (it.id == updatedOrder.id) updatedOrder else it
+    // ---------------------------------------------------------------- friends
+
+    data class AddResult(val added: Int, val skipped: Int)
+
+    /** Adds plain friends by name, skipping blanks and anyone already on the bill (case-insensitive). */
+    fun addFriendsByName(names: List<String>): AddResult {
+        val (toAdd, skipped) = dedupeNames(names, orderList.map { it.friendName })
+        if (toAdd.isNotEmpty()) {
+            commit(orderList + toAdd.map { Order(friendName = it).apply { syncItems() } })
         }
-        _orders.value = sortOrders(newList)
-        saveData()
+        return AddResult(toAdd.size, skipped)
     }
 
-    fun removeOrder(order: Order) {
-        val currentList = _orders.value ?: emptyList()
-        _orders.value = currentList.filter { it.id != order.id }
-        saveData()
+    fun addFriendsBulk(text: String): AddResult = addFriendsByName(text.split("\n"))
+
+    /** Adds a fully specified order (from the Add friend dialog). */
+    fun addFriendOrder(order: Order): Boolean {
+        val normalized = normalize(order)
+        if (normalized.friendName.isBlank()) return false
+        commit(orderList + normalized)
+        return true
+    }
+
+    fun hasFriendNamed(name: String): Boolean {
+        val formatted = NameFormatter.formatName(name)
+        return formatted.isNotBlank() && orderList.any { it.friendName.equals(formatted, ignoreCase = true) }
+    }
+
+    /**
+     * Adds an item to each of the given friends. With [splitBetween] the price is the total for a
+     * shared item and each friend gets an equal share (stored as an expression like "900/3").
+     */
+    fun addFoodToFriends(orderIds: List<String>, food: String, price: Double, rawExpression: String?, splitBetween: Boolean) {
+        val ids = orderIds.toSet()
+        val count = ids.size
+        if (count == 0) return
+        val baseName = food.lowercase().trim()
+        val itemName = if (splitBetween && count > 1) {
+            "$baseName ${getApplication<Application>().getString(R.string.shared_suffix, count)}"
+        } else baseName
+        val share = if (splitBetween) price / count else price
+        val shareRaw = when {
+            splitBetween && count > 1 -> "${PriceCalculator.formatResult(price)}/$count"
+            else -> rawExpression
+        }
+
+        val updated = orderList.map { existing ->
+            if (existing.id !in ids) return@map existing
+            val order = existing.deepCopy()
+            order.syncItems()
+            val first = order.items[0]
+            if (order.items.size == 1 && first.name.isBlank() && Order.isZero(first.price)) {
+                first.name = itemName
+                first.price = share
+                first.rawPriceExpression = shareRaw
+            } else {
+                order.items.add(FoodItem(name = itemName, price = share, rawPriceExpression = shareRaw))
+            }
+            order.syncItems()
+            order.reconcilePaidStatus()
+            order
+        }
+        commit(updated)
+    }
+
+    /**
+     * Stores an edit made in the list. With [notifyList] = false (live typing) the list is saved and
+     * totals refresh, but it is not re-sorted, so the card being edited doesn't jump around.
+     */
+    fun updateOrder(updatedOrder: Order, notifyList: Boolean = true) {
+        if (orderList.none { it.id == updatedOrder.id }) return
+        val normalized = normalize(updatedOrder)
+        commit(orderList.map { if (it.id == normalized.id) normalized else it }, emit = notifyList)
+    }
+
+    fun renameOrder(orderId: String, newName: String): Boolean {
+        val formatted = NameFormatter.formatName(newName)
+        if (formatted.isBlank()) return false
+        commit(orderList.map {
+            if (it.id == orderId) it.deepCopy().apply { friendName = formatted } else it
+        })
+        return true
+    }
+
+    fun togglePaid(orderId: String) {
+        commit(orderList.map {
+            if (it.id == orderId) it.deepCopy().apply { togglePaid() } else it
+        })
+    }
+
+    fun removeOrder(orderId: String): Order? {
+        val removed = orderList.firstOrNull { it.id == orderId } ?: return null
+        commit(orderList.filter { it.id != orderId })
+        return removed
+    }
+
+    fun restoreOrder(order: Order) {
+        if (orderList.any { it.id == order.id }) return
+        commit(orderList + order.deepCopy())
     }
 
     fun removeSuggestion(name: String) {
-        val names = prefs.getStringSet("all_names", emptySet())?.toMutableSet() ?: mutableSetOf()
+        val names = prefs.getStringSet(KEY_NAMES, emptySet())?.toMutableSet() ?: mutableSetOf()
         if (names.remove(name)) {
-            prefs.edit().putStringSet("all_names", names).apply()
-            allUniqueNames.value = names.sorted()
+            prefs.edit().putStringSet(KEY_NAMES, names).apply()
+            allUniqueNames.value = names.sortedWith(String.CASE_INSENSITIVE_ORDER)
         }
     }
 
     fun updateRestaurantName(name: String) {
+        if (restaurantName == name) return
         restaurantName = name
-        prefs.edit().putString("restaurant_name", restaurantName).apply()
+        prefs.edit().putString(KEY_RESTAURANT, restaurantName).apply()
     }
 
-    fun clearOrders() {
-        _orders.value = emptyList()
-        saveData()
+    /** Clears the bill and returns what was there, so it can be restored with [restoreBill]. */
+    fun clearOrders(clearRestaurant: Boolean = false): Pair<List<Order>, String> {
+        val previous = orderList to restaurantName
+        if (clearRestaurant) updateRestaurantName("")
+        commit(emptyList())
+        return previous
     }
+
+    fun restoreBill(snapshot: Pair<List<Order>, String>) {
+        updateRestaurantName(snapshot.second)
+        commit(snapshot.first)
+    }
+
+    // ---------------------------------------------------------------- history
 
     fun getSavedLogs(): List<String> {
-        val jsonString = prefs.getString("saved_logs_json", null)
+        val jsonString = prefs.getString(KEY_LOGS_JSON, null)
         if (jsonString == null) {
             // Migration from old StringSet format
             val oldLogs = prefs.getStringSet("saved_logs", null)
@@ -154,7 +231,7 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
                 val jsonArray = JSONArray()
                 list.forEach { jsonArray.put(it) }
                 prefs.edit()
-                    .putString("saved_logs_json", jsonArray.toString())
+                    .putString(KEY_LOGS_JSON, jsonArray.toString())
                     .remove("saved_logs")
                     .apply()
                 return list
@@ -179,138 +256,42 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
         if (currentLogs.remove(log)) {
             val jsonArray = JSONArray()
             currentLogs.forEach { jsonArray.put(it) }
-            prefs.edit().putString("saved_logs_json", jsonArray.toString()).apply()
+            prefs.edit().putString(KEY_LOGS_JSON, jsonArray.toString()).apply()
         }
     }
+
+    private fun currentSignature(): String = "$restaurantName\n${generateFullReceiptText()}"
+
+    /** True if this exact bill (same restaurant and amounts) is already in history. */
+    fun isCurrentSessionSaved(): Boolean =
+        orderList.isNotEmpty() && prefs.getString(KEY_LAST_SAVED, null) == currentSignature()
 
     fun saveSessionLog() {
         val receiptText = generateFullReceiptText()
         val currentLogs = getSavedLogs().toMutableList()
-        val timestamp = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(java.util.Date())
-        val restaurantInfo = if (restaurantName.isBlank()) "Unknown Restaurant" else restaurantName
-        
-        val logEntry = "[$timestamp] $restaurantInfo\n$receiptText"
-        currentLogs.add(logEntry)
-        
+        val timestamp = ReceiptFormatter.storageTimestamp()
+        val restaurantInfo = restaurantName.ifBlank { getApplication<Application>().getString(R.string.unknown_restaurant) }
+
+        currentLogs.add("[$timestamp] $restaurantInfo\n$receiptText")
+
         val jsonArray = JSONArray()
         currentLogs.forEach { jsonArray.put(it) }
-        prefs.edit().putString("saved_logs_json", jsonArray.toString()).apply()
+        prefs.edit()
+            .putString(KEY_LOGS_JSON, jsonArray.toString())
+            .putString(KEY_LAST_SAVED, currentSignature())
+            .apply()
     }
 
-    fun generateFullReceiptText(): String {
-        val rawOrders = _orders.value ?: return "No orders found."
-        if (rawOrders.isEmpty()) return "No friends or orders added yet."
-        
-        val ordersList = sortOrders(rawOrders)
-        
-        // Dynamic column width calculation based on content
-        var maxNameLen = "FRIEND".length
-        var maxItemLen = "ITEM & INFO".length
-        
-        ordersList.forEach {
-            maxNameLen = maxOf(maxNameLen, it.friendName.length)
-            maxItemLen = maxOf(maxItemLen, it.foodItem.length)
-            val pricePaidStr = "${it.paid.toInt()} / ${it.price.toInt()} tk"
-            maxItemLen = maxOf(maxItemLen, pricePaidStr.length)
-            val cb = it.cashback
-            if (cb != 0.0) {
-                val label = if (cb > 0) "REFUND" else "DUE"
-                maxItemLen = maxOf(maxItemLen, "$label: ${abs(cb).toInt()} tk".length)
-            }
-        }
-        
-        // Add relative padding and boundaries
-        val c1W = (maxNameLen + 6).coerceIn(12, 20)
-        val c2W = (maxItemLen + 6).coerceIn(16, 28)
-        
-        val sb = StringBuilder()
-        
-        fun line(c: String = "-") = "+${c.repeat(c1W)}+${c.repeat(c2W)}+\n"
+    fun generateFullReceiptText(): String = ReceiptFormatter.buildTable(orderList)
 
-        fun wrap(text: String, width: Int): List<String> {
-            if (text.isEmpty()) return listOf("")
-            val contentWidth = (width - 2).coerceAtLeast(1)
-            return text.chunked(contentWidth)
-        }
+    fun generateShareText(): String = ReceiptFormatter.buildShareText(restaurantName, orderList, Date())
 
-        fun row(s1: String, s2: String): String {
-            val lines1 = wrap(s1, c1W)
-            val lines2 = wrap(s2, c2W)
-            val maxLines = maxOf(lines1.size, lines2.size)
-            val res = StringBuilder()
-            for (i in 0 until maxLines) {
-                val p1 = center(lines1.getOrElse(i) { "" }, c1W)
-                val p2 = center(lines2.getOrElse(i) { "" }, c2W)
-                res.append("|$p1|$p2|\n")
-            }
-            return res.toString()
-        }
-        
-        sb.append(line())
-        sb.append(row("FRIEND", "ITEM & INFO"))
-        sb.append(line("="))
-        
-        var totalBill = 0.0
-        var totalPaid = 0.0
-        
-        for (order in ordersList) {
-            sb.append(row(order.friendName, order.foodItem))
-            sb.append(row("", "${order.paid.toInt()} / ${order.price.toInt()} tk"))
-            
-            val cb = order.cashback
-            if (cb != 0.0) {
-                val label = if (cb > 0) "REFUND" else "DUE"
-                sb.append(row("", "$label: ${abs(cb).toInt()} tk"))
-            }
-            sb.append(line())
-            
-            totalBill += order.price
-            totalPaid += order.paid
-        }
-        
-        sb.append("\n")
-        val totalWidth = c1W + c2W + 3
-        
-        fun footerRow(label: String, value: String): String {
-            val space = totalWidth - label.length - value.length
-            return label + " ".repeat(maxOf(1, space)) + value + "\n"
-        }
-        
-        sb.append(footerRow("TOTAL BILL:", "${totalBill.toInt()} tk"))
-        sb.append(footerRow("TOTAL PAID:", "${totalPaid.toInt()} tk"))
-        sb.append("-".repeat(totalWidth)).append("\n")
-        
-        val netChange = totalPaid - totalBill
-        if (netChange > 0) {
-            sb.append(String.format(Locale.getDefault(), "OVERALL REFUND: %d tk 💰", netChange.toInt()))
-        } else if (netChange < 0) {
-            sb.append(String.format(Locale.getDefault(), "OVERALL DUE:    %d tk ⚠️", abs(netChange).toInt()))
-        } else {
-            sb.append("STATUS:         ALL SETTLED ✅")
-        }
-
-        return sb.toString()
-    }
-
-    private fun center(text: String, width: Int): String {
-        val padding = width - text.length
-        val left = padding / 2
-        val right = padding - left
-        return " ".repeat(maxOf(0, left)) + text + " ".repeat(maxOf(0, right))
-    }
-
-    private fun formatName(name: String): String {
-        if (name.isBlank()) return ""
-        return name.trim().lowercase().split(" ").filter { it.isNotBlank() }.joinToString(" ") { 
-            it.replaceFirstChar { char -> if (char.isLowerCase()) char.titlecase(Locale.getDefault()) else char.toString() }
-        }
-    }
+    // ---------------------------------------------------------------- persistence
 
     private fun saveData() {
-        val list = _orders.value ?: return
         val jsonArray = JSONArray()
         try {
-            for (order in list) {
+            for (order in orderList) {
                 val jsonObject = JSONObject()
                 jsonObject.put("id", order.id)
                 jsonObject.put("friendName", order.friendName)
@@ -319,11 +300,31 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
                 jsonObject.put("paid", order.paid)
                 jsonObject.put("previousPaid", order.previousPaid)
                 jsonObject.put("isDone", order.isDone)
+                if (order.rawPriceExpression != null) {
+                    jsonObject.put("rawPriceExpression", order.rawPriceExpression)
+                }
+                if (order.rawPaidExpression != null) {
+                    jsonObject.put("rawPaidExpression", order.rawPaidExpression)
+                }
+
+                val itemsArray = JSONArray()
+                for (item in order.items) {
+                    val itemObj = JSONObject()
+                    itemObj.put("id", item.id)
+                    itemObj.put("name", item.name)
+                    itemObj.put("price", item.price)
+                    if (item.rawPriceExpression != null) {
+                        itemObj.put("rawPriceExpression", item.rawPriceExpression)
+                    }
+                    itemsArray.put(itemObj)
+                }
+                jsonObject.put("items", itemsArray)
+
                 jsonArray.put(jsonObject)
             }
             prefs.edit()
-                .putString("orders_json", jsonArray.toString())
-                .putString("restaurant_name", restaurantName)
+                .putString(KEY_ORDERS, jsonArray.toString())
+                .putString(KEY_RESTAURANT, restaurantName)
                 .apply()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -331,32 +332,83 @@ class OrderViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun loadData() {
-        try {
-            restaurantName = prefs.getString("restaurant_name", "") ?: ""
-            allUniqueNames.value = prefs.getStringSet("all_names", emptySet())?.sorted() ?: emptyList()
-            allUniqueFoodItems.value = prefs.getStringSet("all_items", emptySet())?.sorted() ?: emptyList()
+        restaurantName = prefs.getString(KEY_RESTAURANT, "") ?: ""
+        allUniqueNames.value = prefs.getStringSet(KEY_NAMES, emptySet())?.sortedWith(String.CASE_INSENSITIVE_ORDER) ?: emptyList()
+        allUniqueFoodItems.value = prefs.getStringSet(KEY_ITEMS, emptySet())?.sortedWith(String.CASE_INSENSITIVE_ORDER) ?: emptyList()
 
-            val jsonString = prefs.getString("orders_json", null)
+        val list = mutableListOf<Order>()
+        try {
+            val jsonString = prefs.getString(KEY_ORDERS, null)
             if (jsonString != null) {
                 val jsonArray = JSONArray(jsonString)
-                val list = mutableListOf<Order>()
                 for (i in 0 until jsonArray.length()) {
                     val jsonObject = jsonArray.getJSONObject(i)
-                    list.add(Order(
-                        id = jsonObject.optString("id", java.util.UUID.randomUUID().toString()),
+                    val order = Order(
+                        id = jsonObject.optString("id", UUID.randomUUID().toString()),
                         friendName = jsonObject.optString("friendName", "Unknown"),
                         foodItem = jsonObject.optString("foodItem", ""),
                         price = jsonObject.optDouble("price", 0.0),
                         paid = jsonObject.optDouble("paid", 0.0),
                         previousPaid = jsonObject.optDouble("previousPaid", 0.0),
-                        isDone = jsonObject.optBoolean("isDone", false)
-                    ))
+                        isDone = jsonObject.optBoolean("isDone", false),
+                        rawPriceExpression = jsonObject.optStringOrNull("rawPriceExpression"),
+                        rawPaidExpression = jsonObject.optStringOrNull("rawPaidExpression")
+                    )
+
+                    val itemsArray = jsonObject.optJSONArray("items")
+                    if (itemsArray != null) {
+                        for (j in 0 until itemsArray.length()) {
+                            val itemObj = itemsArray.getJSONObject(j)
+                            order.items.add(FoodItem(
+                                id = itemObj.optString("id", UUID.randomUUID().toString()),
+                                name = itemObj.optString("name", ""),
+                                price = itemObj.optDouble("price", 0.0),
+                                rawPriceExpression = itemObj.optStringOrNull("rawPriceExpression")
+                            ))
+                        }
+                    }
+                    order.syncItems()
+                    list.add(order)
                 }
-                _orders.value = sortOrders(list)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            _orders.value = emptyList()
+        }
+        orderList = sortOrders(list)
+        _orders.value = orderList
+        _summary.value = BillSummary.of(orderList)
+    }
+
+    private fun JSONObject.optStringOrNull(key: String): String? =
+        if (has(key) && !isNull(key)) getString(key) else null
+
+    companion object {
+        private const val KEY_ORDERS = "orders_json"
+        private const val KEY_RESTAURANT = "restaurant_name"
+        private const val KEY_NAMES = "all_names"
+        private const val KEY_ITEMS = "all_items"
+        private const val KEY_LOGS_JSON = "saved_logs_json"
+        private const val KEY_LAST_SAVED = "last_saved_signature"
+
+        private val SHARED_SUFFIX = Regex("""\s*\(shared ÷\d+\)$""")
+
+        /** Strips the "(shared ÷3)" marker so suggestions show the plain item name. */
+        fun suggestionName(itemName: String): String = itemName.replace(SHARED_SUFFIX, "").trim().lowercase()
+
+        /**
+         * Formats names and drops blanks plus anything already present (case-insensitive),
+         * including repeats within [names] itself. Returns the names to add and how many were skipped.
+         */
+        fun dedupeNames(names: List<String>, existing: List<String>): Pair<List<String>, Int> {
+            val seen = existing.map { it.lowercase() }.toMutableSet()
+            val toAdd = mutableListOf<String>()
+            var skipped = 0
+            for (raw in names) {
+                val formatted = NameFormatter.formatName(raw)
+                if (formatted.isBlank()) continue
+                if (seen.add(formatted.lowercase())) toAdd.add(formatted) else skipped++
+            }
+            return toAdd to skipped
         }
     }
 }

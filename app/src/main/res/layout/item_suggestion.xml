@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
     android:gravity="center_vertical"
+    android:minHeight="56dp"
     android:orientation="horizontal"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="8dp">
+    android:paddingStart="12dp"
+    android:paddingEnd="8dp">
 
-    <CheckBox
+    <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/checkBox"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="0dp"
-        android:minHeight="0dp" />
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/tvAvatar"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="4dp"
+        android:background="@drawable/bg_avatar_circle"
+        android:gravity="center"
+        android:importantForAccessibility="no"
+        android:textColor="@color/color_on_primary"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        tools:text="AH" />
 
     <TextView
         android:id="@+id/tvName"
@@ -21,16 +35,33 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/color_on_surface"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        tools:text="Arib Hasan" />
 
-    <ImageButton
+    <TextView
+        android:id="@+id/tvInList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_pill_success"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
+        android:text="@string/in_list"
+        android:textColor="@color/status_refund"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnRemove"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Remove from history"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
-        app:tint="@android:color/holo_red_dark" />
+        style="@style/Widget.App.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/remove_from_saved_desc"
+        app:icon="@drawable/ic_close" />
 
 </LinearLayout>

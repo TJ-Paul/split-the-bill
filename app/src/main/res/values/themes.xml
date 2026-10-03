@@ -2,26 +2,39 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Force light mode -->
-    <style name="Base.Theme.FriendsAndRestaurants" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Base.Theme.FriendsAndRestaurants" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
         <item name="colorOnPrimary">@color/color_on_primary</item>
         <item name="colorPrimaryContainer">@color/color_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/color_on_primary_container</item>
 
         <item name="colorSecondary">@color/color_secondary</item>
         <item name="colorOnSecondary">@color/color_on_secondary</item>
         <item name="colorSecondaryContainer">@color/color_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/color_on_secondary_container</item>
 
         <item name="colorTertiary">@color/color_tertiary</item>
         <item name="colorTertiaryContainer">@color/color_tertiary_container</item>
+        <item name="colorOnTertiaryContainer">@color/color_on_tertiary_container</item>
+
+        <item name="colorError">@color/color_error</item>
 
         <item name="android:colorBackground">@color/color_background</item>
+        <item name="colorOnBackground">@color/color_on_surface</item>
         <item name="colorSurface">@color/color_surface</item>
+        <item name="colorSurfaceVariant">@color/color_surface_variant</item>
+        <item name="colorSurfaceContainerLowest">@color/color_surface_container_lowest</item>
+        <item name="colorSurfaceContainerLow">@color/color_surface_container_low</item>
+        <item name="colorSurfaceContainer">@color/color_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/color_surface_container_high</item>
+        <item name="colorSurfaceContainerHighest">@color/color_surface_container_highest</item>
         <item name="colorOnSurface">@color/color_on_surface</item>
         <item name="colorOnSurfaceVariant">@color/color_on_surface_variant</item>
-        <item name="colorOutline">@color/color_outline</item>
+        <item name="colorOutline">@color/color_field_outline</item>
+        <item name="colorOutlineVariant">@color/color_outline_variant</item>
 
-        <item name="android:statusBarColor">@color/color_primary_dark</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@color/color_background</item>
 
@@ -30,7 +43,7 @@
         <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
         <item name="materialCardViewStyle">@style/Widget.App.Card</item>
         <item name="toolbarStyle">@style/Widget.App.Toolbar</item>
-        <item name="floatingActionButtonStyle">@style/Widget.App.Fab</item>
+        <item name="extendedFloatingActionButtonStyle">@style/Widget.App.ExtendedFab</item>
 
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
 
@@ -41,107 +54,169 @@
 
     <!-- ===================== Component styles ===================== -->
 
-    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="shapeAppearance">@style/ShapeAppearance.App.Dialog</item>
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.App.Dialog</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button.DialogText</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.App.Button.DialogText</item>
+        <item name="buttonBarNeutralButtonStyle">@style/Widget.App.Button.DialogText</item>
     </style>
 
-    <style name="ShapeAppearance.App.Dialog" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+    <style name="ShapeAppearance.App.Dialog" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">18dp</item>
+        <item name="cornerSize">24dp</item>
     </style>
 
-    <style name="Widget.App.Toolbar" parent="Widget.MaterialComponents.Toolbar">
-        <item name="android:background">@color/color_primary</item>
-        <item name="titleTextColor">@color/color_on_primary</item>
-        <item name="subtitleTextColor">@color/color_on_primary</item>
+    <style name="Widget.App.Button.DialogText" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textAllCaps">false</item>
     </style>
 
-    <style name="Widget.App.Fab" parent="Widget.MaterialComponents.FloatingActionButton">
+    <style name="Widget.App.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/color_background</item>
+        <item name="titleTextAppearance">@style/TextAppearance.App.ToolbarTitle</item>
+        <item name="titleTextColor">@color/color_on_surface</item>
+        <item name="subtitleTextColor">@color/color_on_surface_variant</item>
+    </style>
+
+    <style name="TextAppearance.App.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.App.ExtendedFab" parent="Widget.Material3.ExtendedFloatingActionButton.Icon.Primary">
         <item name="backgroundTint">@color/color_secondary</item>
-        <item name="tint">@color/color_on_secondary</item>
-        <item name="elevation">6dp</item>
-        <item name="rippleColor">@color/color_secondary_dark</item>
+        <item name="android:textColor">@color/color_on_secondary</item>
+        <item name="iconTint">@color/color_on_secondary</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
-    <style name="Widget.App.Button.Filled" parent="Widget.MaterialComponents.Button">
-        <item name="backgroundTint">@color/color_primary</item>
-        <item name="cornerRadius">12dp</item>
-        <item name="android:textColor">@color/color_on_primary</item>
-        <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">14dp</item>
+    <style name="Widget.App.Button.Filled" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/button_filled_bg</item>
+        <item name="android:textColor">@color/button_filled_fg</item>
+        <item name="iconTint">@color/button_filled_fg</item>
         <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
-    <style name="Widget.App.Button.Secondary" parent="Widget.MaterialComponents.Button">
+    <style name="Widget.App.Button.Secondary" parent="Widget.Material3.Button">
         <item name="backgroundTint">@color/color_secondary</item>
-        <item name="cornerRadius">12dp</item>
         <item name="android:textColor">@color/color_on_secondary</item>
+        <item name="iconTint">@color/color_on_secondary</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
-    <style name="Widget.App.Button.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="strokeColor">@color/color_primary</item>
-        <item name="strokeWidth">1.5dp</item>
-        <item name="cornerRadius">12dp</item>
-        <item name="android:textColor">@color/color_primary</item>
+    <style name="Widget.App.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="backgroundTint">@color/button_tonal_bg</item>
+        <item name="android:textColor">@color/button_tonal_fg</item>
+        <item name="iconTint">@color/button_tonal_fg</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
-        <item name="rippleColor">@color/color_primary_container</item>
     </style>
 
-    <style name="Widget.App.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/color_on_surface_variant</item>
+    <style name="Widget.App.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/button_outlined_stroke</item>
+        <item name="android:textColor">@color/button_outlined_fg</item>
+        <item name="iconTint">@color/button_outlined_fg</item>
+        <item name="android:letterSpacing">0</item>
         <item name="android:textAllCaps">false</item>
-        <item name="cornerRadius">12dp</item>
     </style>
 
-    <style name="Widget.App.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+    <style name="Widget.App.Button.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/button_text_fg</item>
+        <item name="iconTint">@color/button_text_fg</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.App.Button.Text.Danger" parent="Widget.App.Button.Text">
+        <item name="android:textColor">@color/status_due</item>
+        <item name="iconTint">@color/status_due</item>
+        <item name="rippleColor">@color/status_due_container</item>
+    </style>
+
+    <style name="Widget.App.IconButton" parent="Widget.Material3.Button.IconButton">
+        <item name="iconTint">@color/color_on_surface_variant</item>
+        <item name="android:minWidth">40dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <style name="Widget.App.IconButton.Remove">
+        <item name="icon">@drawable/ic_remove_circle_outline</item>
+        <item name="iconTint">@color/status_due</item>
+        <item name="android:layout_marginStart">0dp</item>
+    </style>
+
+    <!-- Compact text inside list-card fields -->
+    <style name="Widget.App.CardField" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">6dp</item>
+    </style>
+
+    <!-- Money fields accept calculator input such as 120+80 or 900/3 on a number pad -->
+    <style name="Widget.App.CardField.Money">
+        <item name="android:inputType">phone</item>
+        <item name="android:digits">0123456789.+-*/ </item>
+        <item name="android:imeOptions">actionNext</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxCornerRadiusTopStart">12dp</item>
         <item name="boxCornerRadiusTopEnd">12dp</item>
         <item name="boxCornerRadiusBottomStart">12dp</item>
         <item name="boxCornerRadiusBottomEnd">12dp</item>
         <item name="boxStrokeColor">@color/color_primary</item>
         <item name="hintTextColor">@color/color_primary</item>
-        <item name="boxStrokeWidth">1dp</item>
-        <item name="boxStrokeWidthFocused">2dp</item>
         <item name="startIconTint">@color/color_primary</item>
     </style>
 
-    <style name="Widget.App.TextInputLayout.Dense" parent="Widget.App.TextInputLayout">
-        <item name="boxCornerRadiusTopStart">12dp</item>
-        <item name="boxCornerRadiusTopEnd">12dp</item>
-        <item name="boxCornerRadiusBottomStart">12dp</item>
-        <item name="boxCornerRadiusBottomEnd">12dp</item>
+    <style name="Widget.App.TextInputLayout.Dense" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+        <item name="boxStrokeColor">@color/color_primary</item>
+        <item name="hintTextColor">@color/color_primary</item>
+        <item name="startIconTint">@color/color_primary</item>
+        <item name="suffixTextColor">@color/color_on_surface_variant</item>
     </style>
 
-    <style name="Widget.App.Card" parent="Widget.MaterialComponents.CardView">
+    <style name="Widget.App.Card" parent="Widget.Material3.CardView.Outlined">
         <item name="cardBackgroundColor">@color/color_surface</item>
         <item name="cardCornerRadius">16dp</item>
-        <item name="cardElevation">2dp</item>
-        <item name="strokeColor">@color/color_outline</item>
+        <item name="strokeColor">@color/color_outline_variant</item>
         <item name="strokeWidth">1dp</item>
     </style>
 
-    <style name="Widget.App.Chip.Paid" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipBackgroundColor">@color/color_success_container</item>
-        <item name="android:textColor">@color/palette_green_dark</item>
-        <item name="chipIcon">@drawable/ic_check_circle</item>
-        <item name="chipIconTint">@color/palette_green_dark</item>
-        <item name="chipIconSize">18dp</item>
+    <style name="Widget.App.Chip.Status" parent="Widget.Material3.Chip.Assist">
+        <item name="chipMinHeight">30dp</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="chipIconSize">16dp</item>
+        <item name="chipStartPadding">6dp</item>
+        <item name="chipEndPadding">6dp</item>
+        <item name="textStartPadding">4dp</item>
+        <item name="textEndPadding">4dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="ensureMinTouchTargetSize">true</item>
     </style>
 
-    <style name="Widget.App.Chip.Unpaid" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipBackgroundColor">@color/color_secondary_container</item>
-        <item name="android:textColor">@color/color_secondary_dark</item>
-    </style>
-
-    <style name="TextAppearance.App.SectionTitle" parent="TextAppearance.MaterialComponents.Headline5">
+    <style name="TextAppearance.App.SectionTitle" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textColor">@color/color_on_surface</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="TextAppearance.App.Subtitle" parent="TextAppearance.MaterialComponents.Body2">
+    <style name="TextAppearance.App.Subtitle" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/color_on_surface_variant</item>
+    </style>
+
+    <style name="TextAppearance.App.Label" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textColor">@color/color_on_surface_variant</item>
     </style>
 

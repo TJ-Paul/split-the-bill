@@ -23,25 +23,28 @@ You can download the latest stable version of the app directly or build it yours
 
 ## ✨ Features
 
-*   **👥 Effortless Friend Management**: Add friends individually or in bulk. The app remembers frequently used names to make the process even faster.
-*   **🍕 Order Details**: Track specific food items, their prices, and how much each friend has already paid.
-*   **➕ Quick Add Food**: A dedicated button to quickly add the same food item and price to multiple selected friends simultaneously—perfect for group orders.
-*   **🔢 Smart Sorting**: Lists are automatically organized lexicographically and by payment status: **DUE** at the top, followed by **REFUND**, and **Settled** at the bottom.
-*   **💰 Automated Calculations**: Instant calculation of "DUE" or "REFUND" amounts for each person.
-*   **📊 Session Summary**: View an overall summary of the total bill, total paid, and the net status (Overall Due or Refund).
-*   **📜 History & Logs**: Save your dining sessions with timestamps and restaurant names. Review past outings anytime in the History section.
-*   **🎨 Material 3 Design**: A modern, clean interface with intuitive navigation and helpful color-coding (Red for debts, Green for refunds).
-*   **💾 Persistent Storage**: Your data is automatically saved, so you never lose track of a session if the app closes.
+*   **👥 Effortless Friend Management**: Add friends one at a time (with "Add & next" for fast entry), pick from **Recent** friends (with search, select-all, and anyone already on the bill marked "In list"), or **Bulk** add a list of names. Duplicates are skipped automatically.
+*   **🍕 Order Details**: Track each friend's items, prices, and how much they've paid. Add as many items per person as you need.
+*   **🧮 Built-in Calculator**: Type `120+80`, `40*2` or `900/3` straight into any price field — it opens a number pad, shows the result, and remembers your expression when you tap back in.
+*   **➕ Add Item to Many**: Give the same item to several friends at once, or use **Split total** to divide one shared item (e.g. a pizza) equally between them.
+*   **🔢 Smart Sorting**: Lists are organized by payment status — **DUE** at the top, then **REFUND**, then **Settled** — and alphabetically within each group. Each card has a colored edge so you can scan who owes what.
+*   **💰 Automated Calculations**: Live "Due" / "Refund" amounts for each person (decimals included — no more rounding errors), plus a running total bar at the bottom of the screen.
+*   **✅ One-tap "Paid"**: Mark someone as paid in full; if their bill changes later, the app un-marks them so nobody is accidentally let off.
+*   **↩️ Undo**: Removing a friend or clearing the bill can be undone from the snackbar.
+*   **📊 Receipt**: A readable summary (totals, per-person breakdown) or the classic fixed-width table. **Share** it to WhatsApp/Messenger or copy it in one tap.
+*   **📜 History & Logs**: Save receipts with timestamps and restaurant names, browse them with dates and totals, and share or delete old ones.
+*   **🎨 Material 3 Design**: A clean, warm interface with readable colors (red for debts, green for refunds) and proper keyboard handling.
+*   **💾 Persistent Storage**: Every change is saved instantly, so you never lose a session if the app closes.
 
 <br>
 
 ## 🚀 How It Works
 
 1.  **Enter Restaurant Name**: Start by typing where you're eating.
-2.  **Add Friends**: Use "Add Friend" for details, "Quick Add" for regulars, or "Bulk Add" to quickly list everyone at the table.
-3.  **Fill in Details**: Enter what each person ordered, the price, and their payment.
-4.  **Check Receipt**: Tap the Floating Action Button (FAB) to see the full breakdown and session totals.
-5.  **Save Log**: Click "Save Copy" on the receipt screen to keep a record in your history.
+2.  **Add Friends**: Use **Add** for one person with their order, **Recent** for regulars, or **Bulk** to list everyone at the table.
+3.  **Fill in Details**: Enter what each person ordered, the price, and what they paid — right on their card. Use **Add item** for shared dishes.
+4.  **Check Receipt**: Tap **Receipt** in the bottom bar to see the full breakdown and session totals.
+5.  **Save or Share**: Tap **Save** to keep a copy in History, or **Share** to send it to the group.
 
 <br>
 

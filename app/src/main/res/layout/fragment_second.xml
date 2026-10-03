@@ -1,104 +1,291 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_background"
-    android:padding="16dp"
     tools:context=".SecondFragment">
 
-    <TextView
-        android:id="@+id/tvReceiptHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:drawablePadding="8dp"
-        android:letterSpacing="0.02"
-        android:text="🧾 Receipt Summary"
-        android:textAppearance="@style/TextAppearance.App.SectionTitle"
-        android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvRestaurantName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:background="@drawable/bg_pill_secondary"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="4dp"
-        android:textColor="@color/color_secondary_dark"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvReceiptHeader"
-        tools:text="Nando's" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardReceipt"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardBackgroundColor="@color/color_surface"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="1dp"
-        app:strokeColor="@color/color_outline"
-        app:strokeWidth="1dp"
-        app:layout_constraintBottom_toTopOf="@id/btnSaveLog"
-        app:layout_constraintTop_toBottomOf="@id/tvRestaurantName">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp">
 
-            <HorizontalScrollView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp">
+
+                <!-- Header -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    app:cardBackgroundColor="@color/color_primary_container"
+                    app:cardCornerRadius="20dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <TextView
+                            android:id="@+id/tvRestaurantName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="8dp"
+                            android:gravity="center_vertical"
+                            android:textColor="@color/color_on_primary_container"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            app:drawableStartCompat="@drawable/ic_restaurant"
+                            app:drawableTint="@color/color_primary"
+                            tools:text="Nando's" />
+
+                        <TextView
+                            android:id="@+id/tvReceiptMeta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="@color/color_on_primary_container"
+                            android:textSize="13sp"
+                            tools:text="Sat, 3 Oct 2026 · 8:15 PM · 5 friends" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="14dp"
+                            android:text="@string/summary_total_label"
+                            android:textColor="@color/color_on_primary_container"
+                            android:textSize="13sp" />
+
+                        <TextView
+                            android:id="@+id/tvTotalBill"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/color_on_primary_container"
+                            android:textSize="32sp"
+                            android:textStyle="bold"
+                            tools:text="4,500 tk" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:baselineAligned="false"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/stat_paid"
+                                    android:textColor="@color/color_on_primary_container"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvStatPaid"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/color_on_primary_container"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    tools:text="3,000 tk" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/stat_due"
+                                    android:textColor="@color/color_on_primary_container"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvStatDue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/status_due"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    tools:text="1,700 tk" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/stat_refund"
+                                    android:textColor="@color/color_on_primary_container"
+                                    android:textSize="12sp" />
+
+                                <TextView
+                                    android:id="@+id/tvStatRefund"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textColor="@color/status_refund"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    tools:text="200 tk" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvOverall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:background="@drawable/bg_pill_secondary"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"
+                            android:textColor="@color/status_due"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            tools:text="Overall due 1,500 tk" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/toggleView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:checkedButton="@id/btnViewSummary"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnViewSummary"
+                        style="@style/Widget.App.Button.Outlined"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/receipt_view_summary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnViewTable"
+                        style="@style/Widget.App.Button.Outlined"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/receipt_view_table" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <!-- Summary view: one row per friend -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:cardBackgroundColor="@color/color_surface_container_lowest">
+
+                    <LinearLayout
+                        android:id="@+id/llReceiptRows"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@drawable/divider_inset"
+                        android:orientation="vertical"
+                        android:showDividers="middle" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Table view: the same fixed-width receipt that is saved to history -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardReceipt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="@color/color_surface_container_lowest">
+
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tvReceiptDetails"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:fontFamily="monospace"
+                            android:lineSpacingExtra="4dp"
+                            android:padding="14dp"
+                            android:textColor="@color/color_on_surface"
+                            android:textIsSelectable="true"
+                            android:textSize="12sp"
+                            tools:text="Details..." />
+                    </HorizontalScrollView>
+                </com.google.android.material.card.MaterialCardView>
 
                 <TextView
-                    android:id="@+id/tvReceiptDetails"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tvEmptyReceipt"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:fontFamily="monospace"
-                    android:lineSpacingExtra="5dp"
-                    android:padding="18dp"
-                    android:textColor="@color/color_on_surface"
-                    android:textSize="13sp"
-                    tools:text="Details..." />
-            </HorizontalScrollView>
+                    android:gravity="center"
+                    android:padding="32dp"
+                    android:text="@string/receipt_empty"
+                    android:textAppearance="@style/TextAppearance.App.Subtitle"
+                    android:visibility="gone" />
+            </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-    </com.google.android.material.card.MaterialCardView>
+        <LinearLayout
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="12dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnSaveLog"
-        style="@style/Widget.App.Button.Outlined"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="Save Copy to App Log"
-        android:textAllCaps="false"
-        app:icon="@android:drawable/ic_menu_save"
-        app:iconGravity="textStart"
-        app:layout_constraintBottom_toTopOf="@id/btnBack" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveLog"
+                style="@style/Widget.App.Button.Outlined"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:text="@string/save_to_history"
+                app:icon="@drawable/ic_bookmark_add"
+                app:iconGravity="textStart" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnBack"
-        style="@style/Widget.App.Button.Filled"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:text="Back to Orders"
-        android:textAllCaps="false"
-        app:icon="@android:drawable/ic_media_previous"
-        app:iconGravity="textStart"
-        app:layout_constraintBottom_toBottomOf="parent" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnShare"
+                style="@style/Widget.App.Button.Filled"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:text="@string/share"
+                app:icon="@drawable/ic_share"
+                app:iconGravity="textStart" />
+        </LinearLayout>
+    </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

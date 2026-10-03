@@ -2,138 +2,222 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="4dp"
-    android:layout_marginVertical="6dp"
-    app:cardBackgroundColor="@color/color_surface"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeColor="@color/color_outline"
-    app:strokeWidth="1dp">
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginVertical="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:longClickable="true">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:orientation="horizontal">
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/tvAvatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/bg_avatar_circle"
-            android:gravity="center"
-            android:textColor="@color/color_on_primary"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="R" />
+        <!-- Status colour stripe: red = due, green = refund, grey = settled -->
+        <View
+            android:id="@+id/statusStripe"
+            android:layout_width="5dp"
+            android:layout_height="match_parent"
+            android:background="@color/status_empty_stripe" />
 
-        <TextView
-            android:id="@+id/tvFriendName"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:textColor="@color/color_on_surface"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@+id/statusChip"
-            app:layout_constraintStart_toEndOf="@id/tvAvatar"
-            app:layout_constraintTop_toTopOf="@id/tvAvatar"
-            app:layout_constraintBottom_toBottomOf="@id/tvAvatar"
-            tools:text="Rafid" />
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="10dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="10dp">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/statusChip"
-            style="@style/Widget.App.Chip.Unpaid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unpaid"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvAvatar"
-            app:layout_constraintBottom_toBottomOf="@id/tvAvatar" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilFoodItem"
-            style="@style/Widget.App.TextInputLayout.Dense"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:hint="Food Item"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvAvatar">
-
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/etFoodItem"
+            <!-- Header: avatar, name + status, paid chip, actions -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="16dp"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilPrice"
-            style="@style/Widget.App.TextInputLayout.Dense"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="Price"
-            app:suffixText="tk"
-            app:layout_constraintEnd_toStartOf="@+id/tilPaid"
-            app:layout_constraintHorizontal_chainStyle="spread_inside"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilFoodItem">
+                <TextView
+                    android:id="@+id/tvAvatar"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_avatar_circle"
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:textColor="@color/color_on_primary"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:text="R" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPrice"
+                <LinearLayout
+                    android:id="@+id/nameBlock"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:background="?attr/selectableItemBackground"
+                    android:orientation="vertical"
+                    android:paddingVertical="2dp">
+
+                    <TextView
+                        android:id="@+id/tvFriendName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/color_on_surface"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        tools:text="Rafid Hasan" />
+
+                    <TextView
+                        android:id="@+id/tvCashback"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textColor="@color/status_due"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        tools:text="Due 120 tk · 2 items" />
+                </LinearLayout>
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/statusChip"
+                    style="@style/Widget.App.Chip.Status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="@string/chip_paid_desc"
+                    android:text="@string/chip_unpaid" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddFood"
+                    style="@style/Widget.App.IconButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/add_item_desc"
+                    app:icon="@drawable/ic_add"
+                    app:iconTint="@color/color_primary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMore"
+                    style="@style/Widget.App.IconButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/more_options_desc"
+                    app:icon="@drawable/ic_more_vert" />
+            </LinearLayout>
+
+            <!-- Item 1. In single-item mode the Paid field sits at the end of this row. -->
+            <LinearLayout
+                android:id="@+id/llFoodItem1Row"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="16dp"
-                android:inputType="number" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="6dp"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilPaid"
-            style="@style/Widget.App.TextInputLayout.Dense"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:hint="Paid"
-            app:suffixText="tk"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/tilPrice"
-            app:layout_constraintTop_toBottomOf="@id/tilFoodItem">
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilFoodItem"
+                    style="@style/Widget.App.TextInputLayout.Dense"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:hint="@string/food_hint">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etPaid"
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/etFoodItem"
+                        style="@style/Widget.App.CardField"
+                        android:completionThreshold="1"
+                        android:imeOptions="actionNext"
+                        android:inputType="text|textAutoComplete" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilPrice"
+                    style="@style/Widget.App.TextInputLayout.Dense"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1.15"
+                    android:hint="@string/price_hint"
+                    app:suffixText="@string/currency">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPrice"
+                        style="@style/Widget.App.CardField.Money" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRemoveItem1"
+                    style="@style/Widget.App.IconButton.Remove"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/remove_item_desc"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilPaid"
+                    style="@style/Widget.App.TextInputLayout.Dense"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1.15"
+                    android:hint="@string/paid_hint"
+                    app:suffixText="@string/currency">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPaid"
+                        style="@style/Widget.App.CardField.Money"
+                        android:imeOptions="actionDone" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llExtraFoodItems"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="16dp"
-                android:inputType="number" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:layout_marginEnd="6dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/tvCashback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/bg_pill_success"
-            android:drawablePadding="6dp"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp"
-            android:text="Settled"
-            android:textColor="@color/palette_green_dark"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilPrice" />
+            <!-- Multi-item footer: total on the left, Paid field moves here -->
+            <LinearLayout
+                android:id="@+id/llFooter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:layout_marginEnd="6dp"
+                android:baselineAligned="false"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tvTotal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:paddingStart="4dp"
+                    android:textColor="@color/color_on_surface"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:ignore="RtlSymmetry"
+                    tools:text="Total 3,362 tk" />
+
+                <Space
+                    android:id="@+id/footerEndSpace"
+                    android:layout_width="40dp"
+                    android:layout_height="1dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

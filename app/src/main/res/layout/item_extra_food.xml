@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:baselineAligned="false"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilExtraFoodName"
+        style="@style/Widget.App.TextInputLayout.Dense"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:hint="@string/food_hint">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/etExtraFoodName"
+            style="@style/Widget.App.CardField"
+            android:completionThreshold="1"
+            android:imeOptions="actionNext"
+            android:inputType="text|textAutoComplete" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilExtraFoodPrice"
+        style="@style/Widget.App.TextInputLayout.Dense"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_weight="1.15"
+        android:hint="@string/price_hint"
+        app:suffixText="@string/currency">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etExtraFoodPrice"
+            style="@style/Widget.App.CardField.Money" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRemoveExtraFood"
+        style="@style/Widget.App.IconButton.Remove"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/remove_item_desc" />
+
+</LinearLayout>
